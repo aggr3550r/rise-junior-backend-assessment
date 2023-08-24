@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { File } from './file.model';
-import { Folder } from './folder.model';
+import { File } from '../../file/entities/file.model';
+import { Folder } from '../../folder/entities/folder.model';
+import { UserRole } from '../../../enums/user-role.enum';
 
 @Entity()
 export class User {
@@ -15,6 +16,14 @@ export class User {
 
   @Column()
   fullName: string;
+
+  @Column({
+    nullable: false,
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
 
   @OneToMany(() => File, (file) => file.user)
   files: File[];

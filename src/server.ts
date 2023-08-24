@@ -1,8 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import { createConnection } from 'typeorm';
-import logger from '../utils/logger';
+import logger from '../utils/logger.util';
 import { configService } from './config/config.service';
 const app = express();
 
@@ -15,6 +17,15 @@ createConnection(configService.getTypeOrmConfig())
   });
 
 app.use(logger.getMiddleware());
+
+app.use(helmet());
+
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try again in an hour!',
+});
+app.use('/api', limiter);
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));

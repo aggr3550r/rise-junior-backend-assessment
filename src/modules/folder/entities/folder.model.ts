@@ -5,8 +5,8 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { User } from './user.model';
-import { File } from './file.model';
+import { User } from '../../user/entities/user.model';
+import { File } from '../../file/entities/file.model';
 
 @Entity()
 export class Folder {
