@@ -2,12 +2,10 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { File } from '../../file/entities/file.model';
 import { Folder } from '../../folder/entities/folder.model';
 import { UserRole } from '../../../enums/user-role.enum';
+import { BaseModel } from '../../../models/utility/ BaseModel';
 
-@Entity()
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+@Entity('user')
+export class User extends BaseModel {
   @Column()
   email: string;
 
@@ -25,9 +23,9 @@ export class User {
   })
   role: UserRole;
 
-  @OneToMany(() => File, (file) => file.user)
+  @OneToMany(() => File, (file) => file.owner, { nullable: true })
   files: File[];
 
-  @OneToMany(() => Folder, (folder) => folder.user)
+  @OneToMany(() => Folder, (folder) => folder.owner, { nullable: true })
   folders: Folder[];
 }
