@@ -17,6 +17,9 @@ export class File extends BaseModel {
   @Column()
   file_path: string;
 
+  @Column({ nullable: false, default: '' })
+  file_url: string;
+
   @Column({ nullable: true, default: 0 })
   admin_review_count: number;
 
