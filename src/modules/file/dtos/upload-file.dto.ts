@@ -11,3 +11,4 @@ export class UploadFileDTO {
 
   public readonly filename: string;
 }
+

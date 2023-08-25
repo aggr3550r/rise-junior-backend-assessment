@@ -16,9 +16,6 @@ export class PageOptionsDTO {
   take?: number = 20;
 
   @IsOptional()
-  search_term?: string;
-
-  @IsOptional()
   sort_by?: string;
 
   get skip(): number {
