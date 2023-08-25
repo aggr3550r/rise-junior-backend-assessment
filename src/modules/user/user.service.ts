@@ -2,12 +2,13 @@ import { FindOneOptions, Repository, getRepository } from 'typeorm';
 import { User } from './entities/user.model';
 import { CreateUserDTO } from './dtos/create-user.dto';
 import { UpdateUserDTO } from './dtos/update-user.dto';
-import logger from '../../../utils/logger.util';
+import logger from '../../utils/logger.util';
 import { AppError } from '../../exceptions/AppError';
 import { RiseStatusMessage } from '../../enums/rise-response.enum';
 import { PageOptionsDTO } from '../../paging/page-option.dto';
 import { PageMetaDTO } from '../../paging/page-meta.dto';
 import { PageDTO } from '../../paging/page.dto';
+import { UserAlreadyExistsException } from '../../exceptions/UserAlreadyExistsException';
 
 const log = logger.getLogger();
 
@@ -18,6 +19,12 @@ export class UserService {
 
   async createUser(data: CreateUserDTO): Promise<User> {
     try {
+      const userAlreadyExists = await this.findUserByEmail(data.email);
+
+      if (userAlreadyExists) {
+        throw new UserAlreadyExistsException();
+      }
+
       const newUser = this.userRepository.create(data);
       return await this.userRepository.save(newUser);
     } catch (error) {

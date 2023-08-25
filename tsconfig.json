@@ -4,6 +4,12 @@
     "esModuleInterop": true,
     "target": "es5",
     "allowJs": true,
+    "plugins": [
+      {
+        "name": "lit-plugin",
+        "alwaysOn": false // Disable the lit-plugin
+      }
+    ],
     "noImplicitAny": true,
     "moduleResolution": "node",
     "sourceMap": true,

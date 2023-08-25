@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { createConnection } from 'typeorm';
-import logger from '../utils/logger.util';
+import logger from './utils/logger.util';
 import { configService } from './config/config.service';
 const app = express();
 
