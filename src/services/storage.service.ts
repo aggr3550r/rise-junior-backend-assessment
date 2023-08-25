@@ -21,27 +21,22 @@ const s3 = new AWS.S3();
 export class StorageService {
   async uploadFileToS3(data: UploadFileDTO) {
     try {
-      // setup folder
-      const folderName = data?.folder_name;
-      const folderPath = folderName ? `uploads/${folderName}/` : 'uploads/';
-
-      // setup file
-      const fileName = data.filename;
+      const fileKey = this.constructS3FileKey(data);
       const filePath = data.file_path;
 
       const fileContent = FileUtil.readFileContent(filePath);
 
       const params = {
         Bucket: S3_BUCKET_NAME,
-        Key: folderPath + fileName,
+        Key: fileKey,
         Body: fileContent,
       };
 
       try {
         await s3.upload(params).promise();
-        log.info(`File ${fileName} uploaded successfully.`);
+        log.info(`File ${data.filename} uploaded successfully.`);
       } catch (error) {
-        log.error(`Error uploading ${fileName}:`, error);
+        log.error(`Error uploading ${data.filename}:`, error);
       }
     } catch (error) {
       log.error('uploadFileToS3() error', error);
@@ -51,10 +46,15 @@ export class StorageService {
 
   async removeFileFromS3(fileName: string, folderName?: string) {
     try {
-      const folderPath = folderName ? `uploads/${folderName}/` : 'uploads/';
+      const data: Partial<UploadFileDTO> = {
+        filename: fileName,
+        folder_name: folderName,
+      }
+
+      const fileKey = this.constructS3FileKey(data);
       const params = {
         Bucket: S3_BUCKET_NAME,
-        Key: folderPath + fileName,
+        Key: fileKey,
       };
 
       try {
@@ -67,5 +67,15 @@ export class StorageService {
       log.error('removeFileFromS3() error', error);
       throw new AppError('Error removing file from S3 Bucket...', 400);
     }
+  }
+
+  private constructS3FileKey(data: Partial<UploadFileDTO>) {
+    const folderName = data?.folder_name;
+    const folderPath = folderName ? `uploads/${folderName}/` : 'uploads/';
+
+    const fileName = data.filename;
+
+    const fileKey = folderName + fileName;
+    return fileKey;
   }
 }

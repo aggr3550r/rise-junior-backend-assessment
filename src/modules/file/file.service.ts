@@ -20,6 +20,7 @@ import { PageDTO } from '../../paging/page.dto';
 import { GetFileOptionsPageDTO } from './dtos/get-file-options.dto';
 import { ReviewFileDTO } from './dtos/review-file.dto';
 import { StorageService } from '../../services/storage.service';
+import { FileFlag } from '../../enums/file-flag.enum';
 
 const log = logger.getLogger();
 
@@ -39,7 +40,9 @@ export class FileService {
       const fileAlreadyExists = await this.findFileByFilename(filename);
 
       if (fileAlreadyExists) {
-        throw new ResourceAlreadyExistsException();
+        throw new ResourceAlreadyExistsException(
+          'File with that name already exists, choose another.'
+        );
       }
 
       const fileSize = FileUtil.computeFileSize(file_path);
@@ -64,12 +67,9 @@ export class FileService {
     }
   }
 
-  async updateFile(id: string, updates: UpdateFileDTO) {
+  async updateFile(id: string, updates: Partial<UpdateFileDTO>) {
     try {
       const file = await this.findFileById(id);
-
-      if (!file) throw new ResourceNotFoundException();
-
       Object.assign(file, updates);
       return await this.fileRepository.save(file);
     } catch (error) {
@@ -78,16 +78,32 @@ export class FileService {
     }
   }
 
-  async reviewFile(data: ReviewFileDTO) {
+  async reviewFile(id: string, data: ReviewFileDTO) {
     try {
+      const file = await this.findFileById(id);
+
+      const adminReviewCount = file.admin_review_count + 1;
+
+      const updates: Partial<UpdateFileDTO & ReviewFileDTO> = {
+        file_flag: data.fileFlag,
+        admin_review_count: adminReviewCount,
+        admin_review_comment: data.admin_review_comment,
+      };
+
+      if (updates.fileFlag === FileFlag.UNSAFE && adminReviewCount >= 3) {
+        await this.deleteFile(id);
+      }
+      return await this.updateFile(id, updates);
     } catch (error) {
       log.error('reviewFile() error', error);
-      throw new AppError(RiseStatusMessage.FAILED, 400);
+      throw new AppError(error.message, error.status);
     }
   }
 
-  async getFileById() {
+  async getFileById(id: string) {
     try {
+      const file = await this.findFileById(id);
+      return file;
     } catch (error) {
       log.error('getFileById() error', error);
       throw new AppError(RiseStatusMessage.FAILED, 400);
@@ -172,7 +188,14 @@ export class FileService {
         },
       };
 
-      return await this.fileRepository.findOne(options);
+      const fileExists = await this.fileRepository.findOne(options);
+
+      if (!fileExists) {
+        throw new ResourceNotFoundException(
+          `File with that id ${id} does not exist!`
+        );
+      }
+      return fileExists;
     } catch (error) {
       log.error('findUserById() error', error);
       throw new AppError('Unable to find file with that id', 400);
