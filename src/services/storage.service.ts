@@ -18,11 +18,11 @@ AWS.config.update({
 // Create S3 instance
 const s3 = new AWS.S3();
 
-export class UploadService {
+export class StorageService {
   async uploadFileToS3(data: UploadFileDTO) {
     try {
       // setup folder
-      const folderName = data.folder_name;
+      const folderName = data?.folder_name;
       const folderPath = folderName ? `uploads/${folderName}/` : 'uploads/';
 
       // setup file
@@ -46,6 +46,26 @@ export class UploadService {
     } catch (error) {
       log.error('uploadFileToS3() error', error);
       throw new AppError('Error uploading file to S3 Bucket...', 400);
+    }
+  }
+
+  async removeFileFromS3(fileName: string, folderName?: string) {
+    try {
+      const folderPath = folderName ? `uploads/${folderName}/` : 'uploads/';
+      const params = {
+        Bucket: S3_BUCKET_NAME,
+        Key: folderPath + fileName,
+      };
+
+      try {
+        await s3.deleteObject(params).promise();
+        log.info(`File ${fileName} removed from S3 bucket.`);
+      } catch (error) {
+        log.error(`Error removing ${fileName} from S3 bucket:`, error);
+      }
+    } catch (error) {
+      log.error('removeFileFromS3() error', error);
+      throw new AppError('Error removing file from S3 Bucket...', 400);
     }
   }
 }
