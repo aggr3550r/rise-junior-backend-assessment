@@ -17,10 +17,10 @@ export class FileService {
 
   async createFile(user: User, data: CreateFileDTO) {
     try {
-      const { file_path, filename } = FileUtil.parseFilePath(data.file_path);
+      const { file_path, filename } = FileUtil.sanitizeFilePath(data.file_path);
 
       // Make sure no files with same filename already exist
-      const fileAlreadyExists = await this.findFileByFilename(data.filename);
+      const fileAlreadyExists = await this.findFileByFilename(filename);
 
       if (fileAlreadyExists) {
         throw new ResourceAlreadyExistsException();
@@ -29,9 +29,10 @@ export class FileService {
       const fileSize = FileUtil.computeFileSize(file_path);
 
       data.size = fileSize;
-      data.filename;
+      data.owner = user;
 
       const newFile = this.fileRepository.create(data);
+      return await this.fileRepository.save(newFile);
     } catch (error) {
       log.error('createFile() error', error);
       throw new AppError(error.message, 400);

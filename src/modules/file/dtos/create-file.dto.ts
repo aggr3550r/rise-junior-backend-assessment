@@ -6,6 +6,8 @@ import {
   IsString,
 } from 'class-validator';
 import { SupportedExtension } from '../../../enums/supported-extension.enum';
+import { User } from '../../user/entities/user.model';
+import { Folder } from '../../folder/entities/folder.model';
 
 export class CreateFileDTO {
   // user chosen image filename without extension
@@ -25,4 +27,10 @@ export class CreateFileDTO {
   @IsNotEmpty()
   @IsEnum(SupportedExtension)
   extension: SupportedExtension;
+
+  @IsOptional()
+  owner: User;
+
+  @IsOptional()
+  folder: Folder;
 }
