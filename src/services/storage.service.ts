@@ -34,9 +34,11 @@ export class StorageService {
 
       try {
         await s3.upload(params).promise();
+        return fileKey;
         log.info(`File ${data.filename} uploaded successfully.`);
       } catch (error) {
         log.error(`Error uploading ${data.filename}:`, error);
+        return;
       }
     } catch (error) {
       log.error('uploadFileToS3() error', error);
@@ -49,7 +51,7 @@ export class StorageService {
       const data: Partial<UploadFileDTO> = {
         filename: fileName,
         folder_name: folderName,
-      }
+      };
 
       const fileKey = this.constructS3FileKey(data);
       const params = {
@@ -69,13 +71,31 @@ export class StorageService {
     }
   }
 
+  async getDownloadUrl(fileKey: string) {
+    try {
+      const params = {
+        Bucket: S3_BUCKET_NAME,
+        Key: fileKey,
+      };
+
+      const url = s3.getSignedUrl('getObject', params);
+      return url;
+    } catch (error) {
+      log.error('getDownloadUrl() error', error);
+      throw new AppError('Error generating dowload URL', 400);
+    }
+  }
+
+  /**
+   * This concatenates the optional user chosen folder name to the user chosen file name according to the requirements of the specific S3 bucket
+   */
   private constructS3FileKey(data: Partial<UploadFileDTO>) {
     const folderName = data?.folder_name;
     const folderPath = folderName ? `uploads/${folderName}/` : 'uploads/';
 
     const fileName = data.filename;
 
-    const fileKey = folderName + fileName;
+    const fileKey = folderPath + fileName;
     return fileKey;
   }
 }

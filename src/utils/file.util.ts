@@ -12,13 +12,6 @@ const log = logger.getLogger();
 export default class FileUtil {
   static sanitizeFilePath(filePath: string) {
     try {
-      const leadingForwardSlash = filePath[0];
-      if (leadingForwardSlash !== '/') {
-        throw new FilepathIncompleteException(
-          'File path incomplete. Please add a leading forward slash to the filepath'
-        );
-      }
-
       // Perform standardization on filepath
       filePath = path.normalize(filePath);
       filePath = path.resolve(filePath);
