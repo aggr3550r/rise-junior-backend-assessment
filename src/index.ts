@@ -2,6 +2,9 @@ import http from 'http';
 import logger from './utils/logger.util';
 import { app } from './server';
 import { configService } from './config/config.service';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env' });
 
 process.on('unhandledException', (err) => {
   console.log('UNCAUGHT EXCEPTION! Shutting down...');

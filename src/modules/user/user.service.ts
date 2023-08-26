@@ -12,7 +12,6 @@ import { UserAlreadyExistsException } from '../../exceptions/UserAlreadyExistsEx
 import { GetFileOptionsPageDTO } from '../file/dtos/get-file-options.dto';
 import { FileService } from '../file/file.service';
 import { File } from '../file/entities/file.model';
-import { Folder } from 'aws-sdk/clients/storagegateway';
 
 const log = logger.getLogger();
 
