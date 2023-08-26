@@ -4,22 +4,16 @@ import { CreateUserDTO } from './dtos/create-user.dto';
 import { UpdateUserDTO } from './dtos/update-user.dto';
 import logger from '../../utils/logger.util';
 import { AppError } from '../../exceptions/AppError';
-import { RiseStatusMessage } from '../../enums/rise-response.enum';
+import { RiseVestStatusMsg } from '../../enums/rise-response.enum';
 import { PageOptionsDTO } from '../../paging/page-option.dto';
 import { PageMetaDTO } from '../../paging/page-meta.dto';
 import { PageDTO } from '../../paging/page.dto';
 import { UserAlreadyExistsException } from '../../exceptions/UserAlreadyExistsException';
-import { GetFileOptionsPageDTO } from '../file/dtos/get-file-options.dto';
-import { FileService } from '../file/file.service';
-import { File } from '../file/entities/file.model';
 
 const log = logger.getLogger();
 
 export class UserService {
-  constructor(
-    private userRepository: Repository<User>,
-    private readonly fileService: FileService
-  ) {
+  constructor(private userRepository: Repository<User>) {
     this.userRepository = getRepository(User);
   }
 
@@ -35,18 +29,18 @@ export class UserService {
       return await this.userRepository.save(newUser);
     } catch (error) {
       log.error('createUser() error', error);
-      throw new AppError(RiseStatusMessage.FAILED, 400);
+      throw new AppError(RiseVestStatusMsg.FAILED, 400);
     }
   }
 
-  async updateUser(data: UpdateUserDTO): Promise<User> {
+  async updateUser(id: string, data: UpdateUserDTO): Promise<User> {
     try {
-      const user = await this.findUserById(data.id);
+      const user = await this.findUserById(id);
       Object.assign(user, data);
       return await this.userRepository.save(user);
     } catch (error) {
       log.error('updateUser() error', error);
-      throw new AppError(RiseStatusMessage.FAILED, 400);
+      throw new AppError(RiseVestStatusMsg.FAILED, 400);
     }
   }
 
@@ -97,7 +91,7 @@ export class UserService {
       return true;
     } catch (error) {
       log.error('deleteUser() error', error);
-      throw new AppError(RiseStatusMessage.FAILED, 400);
+      throw new AppError(RiseVestStatusMsg.FAILED, 400);
     }
   }
 
@@ -123,23 +117,23 @@ export class UserService {
       return new PageDTO(items, pageMetaDTO);
     } catch (error) {
       log.error('getAllUsers() error', error);
-      throw new AppError(RiseStatusMessage.FAILED, 400);
+      throw new AppError(RiseVestStatusMsg.FAILED, 400);
     }
   }
 
-  async getFilesForUser(
-    getFileOptionsPageDTO: GetFileOptionsPageDTO
-  ): Promise<PageDTO<File>> {
-    try {
-      const paginatedFiles: PageDTO<File> =
-        await this.fileService.getFilesForUser(getFileOptionsPageDTO);
+  // async getFilesForUser(
+  //   getFileOptionsPageDTO: GetFileOptionsPageDTO
+  // ): Promise<PageDTO<File>> {
+  //   try {
+  //     const paginatedFiles: PageDTO<File> =
+  //       await this.fileService.getFilesForUser(getFileOptionsPageDTO);
 
-      log.info('** Successfully fetched files ** \n', paginatedFiles);
+  //     log.info('** Successfully fetched files ** \n', paginatedFiles);
 
-      return paginatedFiles;
-    } catch (error) {
-      log.error('getFilesForUser() error', error);
-      throw new AppError(RiseStatusMessage.FAILED, 400);
-    }
-  }
+  //     return paginatedFiles;
+  //   } catch (error) {
+  //     log.error('getFilesForUser() error', error);
+  //     throw new AppError(RiseVestStatusMsg.FAILED, 400);
+  //   }
+  // }
 }

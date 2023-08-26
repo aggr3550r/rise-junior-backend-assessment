@@ -1,0 +1,86 @@
+import { HttpStatus } from '../../enums/http-status.enum';
+import { RiseVestStatusMsg } from '../../enums/rise-response.enum';
+import { ResponseModel } from '../../models/utility/ResponseModel';
+
+import { AuthService } from './auth/auth.service';
+import { User } from './entities/user.model';
+import { UserService } from './user.service';
+
+export class UserController {
+  constructor(
+    private userService: UserService,
+    private authService: AuthService
+  ) {}
+
+  async registerUser(request: any): Promise<ResponseModel<User>> {
+    try {
+      const { email, password } = request.body;
+      const data = await this.authService.signup({ email, password });
+      return new ResponseModel(
+        HttpStatus.CREATED,
+        'User successfully created',
+        data
+      );
+    } catch (error) {
+      return new ResponseModel(
+        error?.status || HttpStatus.BAD_REQUEST,
+        error?.message || 'Error occurred while updating user.',
+        null
+      );
+    }
+  }
+
+  async updateUser(request: any) {
+    try {
+      const { id } = request.params;
+      const data = request.body;
+
+      const serviceResponse = await this.userService.updateUser(id, data);
+
+      return new ResponseModel(
+        HttpStatus.OK,
+        'User successfully updated',
+        serviceResponse
+      );
+    } catch (error) {
+      return new ResponseModel(
+        error?.status || HttpStatus.BAD_REQUEST,
+        RiseVestStatusMsg.FAILED,
+        null
+      );
+    }
+  }
+
+  async deleteUser(request: any) {
+    try {
+      const { id } = request.params;
+
+      await this.userService.deleteUser(id);
+
+      return new ResponseModel(HttpStatus.OK, 'User successfully deleted.', {
+        userId: id,
+      });
+    } catch (error) {
+      return new ResponseModel(
+        error?.status || HttpStatus.BAD_REQUEST,
+        RiseVestStatusMsg.FAILED,
+        null
+      );
+    }
+  }
+
+  async getUser(request: any) {
+    try {
+      const { id } = request.params;
+      const user = await this.userService.getUserById(id);
+
+      return new ResponseModel(HttpStatus.OK, RiseVestStatusMsg.SUCCESS, user);
+    } catch (error) {
+      return new ResponseModel(
+        error?.status || HttpStatus.BAD_REQUEST,
+        error?.message || RiseVestStatusMsg.FAILED,
+        null
+      );
+    }
+  }
+}

@@ -20,8 +20,9 @@ export class File extends BaseModel {
   @Column({ nullable: false, default: '' })
   file_download_link: string;
 
+  // this tracks the number of times any admin has marked a file as unsafe
   @Column({ nullable: true, default: 0 })
-  admin_review_count: number;
+  unsafe_count: number;
 
   @Column({ nullable: false, default: AdminReviewComment.FILE_OKAY })
   admin_review_comment: string;

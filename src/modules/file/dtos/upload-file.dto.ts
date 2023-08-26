@@ -9,6 +9,7 @@ export class UploadFileDTO {
   @IsOptional()
   public readonly folder_name?: string;
 
-  public readonly filename: string;
+  @IsOptional()
+  public filename?: string;
 }
 

@@ -2,12 +2,14 @@ import { Response } from 'express';
 import SecurityUtil from '../../../utils/security.util';
 import { User } from '../entities/user.model';
 import { UserService } from '../user.service';
-import { RiseStatusMessage } from '../../../enums/rise-response.enum';
+import { RiseVestStatusMsg } from '../../../enums/rise-response.enum';
 import logger from '../../../utils/logger.util';
 import { CreateUserDTO } from '../dtos/create-user.dto';
 import { AppError } from '../../../exceptions/AppError';
 import { LoginDTO } from '../dtos/login-dto';
 import { ResourceNotFoundException } from '../../../exceptions/ResourceNotFound';
+import { ResponseModel } from '../../../models/utility/ResponseModel';
+import { HttpStatus } from '../../../enums/http-status.enum';
 
 const log = logger.getLogger();
 
@@ -45,8 +47,15 @@ export class AuthService {
 
       log.info(token);
 
-      res.status(statusCode).json({
-        status: RiseStatusMessage.SUCCESS,
+      // res.status(statusCode).json({
+      //   status: RiseVestStatusMsg.SUCCESS,
+      //   token,
+      //   data: {
+      //     user,
+      //   },
+      // });
+
+      return new ResponseModel(HttpStatus.OK, 'User successfully logged in', {
         token,
         data: {
           user,
@@ -63,11 +72,10 @@ export class AuthService {
 
   async signup(data: CreateUserDTO) {
     try {
-      let { id, email, password } = data;
+      let { email, password } = data;
       password = await SecurityUtil.encryptPassword(password);
 
       const userData: CreateUserDTO = {
-        id,
         email,
         password,
       };

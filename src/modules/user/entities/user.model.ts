@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import { File } from '../../file/entities/file.model';
 import { Folder } from '../../folder/entities/folder.model';
 import { UserRole } from '../../../enums/user-role.enum';

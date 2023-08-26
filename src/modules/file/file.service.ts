@@ -8,7 +8,7 @@ import { CreateFileDTO } from './dtos/create-file.dto';
 import FileUtil from '../../utils/file.util';
 import { AppError } from '../../exceptions/AppError';
 import logger from '../../utils/logger.util';
-import { RiseStatusMessage } from '../../enums/rise-response.enum';
+import { RiseVestStatusMsg } from '../../enums/rise-response.enum';
 import { File } from './entities/file.model';
 import { ResourceAlreadyExistsException } from '../../exceptions/ResourceAlreadyExistsException';
 import { UploadFileDTO } from './dtos/upload-file.dto';
@@ -21,7 +21,6 @@ import { ReviewFileDTO } from './dtos/review-file.dto';
 import { StorageService } from '../../services/storage.service';
 import { FileFlag } from '../../enums/file-flag.enum';
 import { UserService } from '../user/user.service';
-import { FolderService } from '../folder/folder.service';
 import { QueryType } from '../../enums/query-type.enum';
 
 const log = logger.getLogger();
@@ -42,7 +41,7 @@ export class FileService {
       const { file_path, filename } = FileUtil.sanitizeFilePath(data.file_path);
 
       // Make sure no files with same filename already exist
-      const fileAlreadyExists = await this.findFileByFilename(filename);
+      const fileAlreadyExists = await this.findFileByFilename(userId, filename);
 
       if (fileAlreadyExists) {
         throw new ResourceAlreadyExistsException(
@@ -52,10 +51,12 @@ export class FileService {
 
       const fileSize = FileUtil.computeFileSize(file_path);
 
-      data.size = fileSize;
       data.owner = owner;
+      data.filename = filename;
+      data.file_path = file_path;
 
       const newFile = this.fileRepository.create(data);
+      newFile.size = fileSize;
       return await this.fileRepository.save(newFile);
     } catch (error) {
       log.error('createFile() error', error);
@@ -64,6 +65,7 @@ export class FileService {
   }
 
   async updateFile(
+    userId: string,
     queryType: QueryType,
     queryString: string,
     updates: Partial<UpdateFileDTO>
@@ -83,16 +85,16 @@ export class FileService {
     }
   }
 
-  async uploadFile(data: UploadFileDTO) {
+  async uploadFile(userId: string, data: UploadFileDTO) {
     try {
       const fileKey = await this.storageService.uploadFileToS3(data);
 
       log.info(
-        '** File uploaded to S3 bucket: collecting details...*** \n ',
+        '** File uploaded to S3 bucket: collecting details...** \n ',
         fileKey
       );
 
-      // So when a file is uploaded then we should also create a download link for it
+      // So basically when a file is uploaded then we should also create a download link for it
       const file_download_link = await this.storageService.getDownloadUrl(
         fileKey
       );
@@ -100,23 +102,30 @@ export class FileService {
       const { filename } = FileUtil.sanitizeFilePath(fileKey);
 
       // Update file. It can now be downloaded publicly
-      await this.updateFile(QueryType.NAME, filename, { file_download_link });
+      await this.updateFile(userId, QueryType.NAME, filename, {
+        file_download_link,
+      });
     } catch (error) {
       log.error('uploadFile() error', error);
-      throw new AppError(RiseStatusMessage.FAILED, 400);
+      throw new AppError(RiseVestStatusMsg.FAILED, 400);
     }
   }
 
-  async serveDownload(fileId?: string, filename?: string): Promise<string> {
+  async serveDownload(
+    userId: string,
+    fileId?: string,
+    filename?: string
+  ): Promise<string> {
     try {
       let queryType: QueryType = QueryType.ID;
       let file: File;
       if (filename) {
         file = await this.findFileByEitherFilenameOrId(
+          userId,
           filename,
           QueryType.NAME
         );
-      } else file = await this.findFileByEitherFilenameOrId(fileId);
+      } else file = await this.findFileByEitherFilenameOrId(userId, fileId);
 
       const { file_download_link } = file;
 
@@ -130,35 +139,42 @@ export class FileService {
     }
   }
 
-  async reviewFile(id: string, data: ReviewFileDTO): Promise<File> {
+  async reviewFile(fileId: string, data: ReviewFileDTO): Promise<File> {
     try {
-      const file = await this.findFileById(id);
+      const file = await this.fileRepository.findOneBy({
+        id: fileId,
+        is_active: true,
+      });
+      let fileUnsafeFlagCount = file.unsafe_count;
 
-      const adminReviewCount = file.admin_review_count + 1;
+      const userId = file.owner.id;
+
+      if (data.fileFlag === FileFlag.UNSAFE) fileUnsafeFlagCount += 1;
 
       const updates: Partial<UpdateFileDTO & ReviewFileDTO> = {
         file_flag: data.fileFlag,
-        admin_review_count: adminReviewCount,
+        unsafe_count: fileUnsafeFlagCount,
         admin_review_comment: data.admin_review_comment,
       };
 
-      if (updates.fileFlag === FileFlag.UNSAFE && adminReviewCount >= 3) {
-        await this.deleteFile(id);
+      if (fileUnsafeFlagCount >= 3) {
+        await this.deleteFile(userId, fileId);
       }
-      return await this.updateFile(QueryType.ID, id, updates);
+
+      return await this.updateFile(userId, QueryType.ID, fileId, updates);
     } catch (error) {
       log.error('reviewFile() error', error);
       throw new AppError(error.message, error.status);
     }
   }
 
-  async getFileById(id: string): Promise<File> {
+  async getFileById(userId: string, fileId: string): Promise<File> {
     try {
-      const file = await this.findFileById(id);
+      const file = await this.findFileById(userId, fileId);
       return file;
     } catch (error) {
       log.error('getFileById() error', error);
-      throw new AppError(RiseStatusMessage.FAILED, 400);
+      throw new AppError(RiseVestStatusMsg.FAILED, 400);
     }
   }
 
@@ -189,18 +205,18 @@ export class FileService {
       return new PageDTO(items, pageMetaDTO);
     } catch (error) {
       log.error('getAllFilesByCustomQuery() error', error);
-      throw new AppError(RiseStatusMessage.FAILED, 400);
+      throw new AppError(RiseVestStatusMsg.FAILED, 400);
     }
   }
 
   async getFilesForUser(
+    userId: string,
     getFileOptionsPageDTO: GetFileOptionsPageDTO
   ): Promise<PageDTO<File>> {
     try {
       let [items, count] = await this.fileRepository.findAndCount({
         where: {
-          id: getFileOptionsPageDTO.fileId,
-          owner: { id: getFileOptionsPageDTO.userId },
+          owner: { id: userId },
           is_active: true,
         },
         skip: getFileOptionsPageDTO?.skip,
@@ -215,19 +231,20 @@ export class FileService {
       return new PageDTO(items, pageMetaDTO);
     } catch (error) {
       log.error('getFilesForUser() error', error);
-      throw new AppError(RiseStatusMessage.FAILED, 400);
+      throw new AppError(RiseVestStatusMsg.FAILED, 400);
     }
   }
 
   async findFileByEitherFilenameOrId(
+    userId: string,
     queryString: string,
     queryType?: QueryType
   ) {
     try {
       let file: File;
       if (queryType === QueryType.NAME)
-        file = await this.findFileByFilename(queryString);
-      else file = await this.findFileById(queryString);
+        file = await this.findFileByFilename(userId, queryString);
+      else file = await this.findFileById(userId, queryString);
 
       return file;
     } catch (error) {
@@ -236,12 +253,13 @@ export class FileService {
     }
   }
 
-  async findFileById(id: string) {
+  async findFileById(fileId: string, userId: string) {
     try {
       const options: FindOneOptions<File> = {
         where: {
-          id,
+          id: fileId,
           is_active: true,
+          owner: { id: userId },
         },
       };
 
@@ -249,7 +267,7 @@ export class FileService {
 
       if (!fileExists) {
         throw new ResourceNotFoundException(
-          `File with that id ${id} does not exist!`
+          `File with that id ${fileId} does not exist!`
         );
       }
       return fileExists;
@@ -259,12 +277,13 @@ export class FileService {
     }
   }
 
-  async findFileByFilename(filename: string) {
+  async findFileByFilename(userId: string, filename: string) {
     try {
       const options: FindOneOptions<File> = {
         where: {
           filename,
           is_active: true,
+          owner: { id: userId },
         },
       };
 
@@ -273,13 +292,13 @@ export class FileService {
       return file;
     } catch (error) {
       log.error('findFileByFilename() error', error);
-      throw new AppError(RiseStatusMessage.FAILED, 400);
+      throw new AppError(RiseVestStatusMsg.FAILED, 400);
     }
   }
 
-  async deleteFile(id: string) {
+  async deleteFile(userId: string, fileId: string) {
     try {
-      const file = await this.findFileById(id);
+      const file = await this.findFileById(userId, fileId);
       if (!file) {
         return false;
       }

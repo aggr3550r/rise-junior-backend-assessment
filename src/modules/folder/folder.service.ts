@@ -4,11 +4,12 @@ import { UserService } from '../user/user.service';
 import { ResourceNotFoundException } from '../../exceptions/ResourceNotFound';
 import { AppError } from '../../exceptions/AppError';
 import logger from '../../utils/logger.util';
-import { RiseStatusMessage } from '../../enums/rise-response.enum';
+import { RiseVestStatusMsg } from '../../enums/rise-response.enum';
 import { FileService } from '../file/file.service';
 import { PageDTO } from '../../paging/page.dto';
 import { GetFolderOptionsDTO } from './dtos/get-folder-options.dto';
 import { PageMetaDTO } from '../../paging/page-meta.dto';
+import { UnauthorizedException } from '../../exceptions/UnauthorizedException';
 
 const log = logger.getLogger();
 export class FolderService {
@@ -25,27 +26,45 @@ export class FolderService {
       const owner = await this.userService.findUserById(ownerId);
       const newFolder = this.folderRepository.create({ name, owner });
       return await this.folderRepository.save(newFolder);
-    } catch (error) {}
+    } catch (error) {
+      log.error('createFolder() error \n', error);
+      throw new AppError('Unable to create file.', 400);
+    }
   }
 
-  async updateFolder(id: string, name: string): Promise<Folder | null> {
-    const folder = await this.findFolderById(id);
-    folder.name = name;
-    return await this.folderRepository.save(folder);
+  async updateFolder(
+    userId: string,
+    folderId: string,
+    name: string
+  ): Promise<Folder> {
+    try {
+      const folder = await this.findFolderById(userId, folderId);
+      folder.name = name;
+      return await this.folderRepository.save(folder);
+    } catch (error) {
+      log.error('updateFolder() error \n', error);
+      throw new AppError('An error occurred while updating folder.', 400);
+    }
   }
 
-  async deleteFolder(id: string): Promise<boolean> {
-    const folder = await this.findFolderById(id);
-    await this.folderRepository.remove(folder);
-    return true;
+  async deleteFolder(userId: string, folderId: string): Promise<boolean> {
+    try {
+      const folder = await this.findFolderById(userId, folderId);
+      await this.folderRepository.remove(folder);
+      return true;
+    } catch (error) {
+      log.error('deleteFolder() error \n', error);
+      throw new AppError(RiseVestStatusMsg.FAILED, 400);
+    }
   }
 
-  async findFolderById(id: string): Promise<Folder> {
+  async findFolderById(userId: string, folderId: string): Promise<Folder> {
     try {
       const options: FindOneOptions<Folder> = {
         where: {
-          id,
+          id: folderId,
           is_active: true,
+          owner: { id: userId },
         },
       };
 
@@ -53,41 +72,19 @@ export class FolderService {
 
       if (!folderExists) {
         throw new ResourceNotFoundException(
-          `File with that id ${id} does not exist!`
+          `Folder with that id ${folderId} does not exist!`
         );
       }
 
       return folderExists;
     } catch (error) {
-      log.error('findFolderById() error', error);
+      log.error('findFolderById() error \n', error);
       throw new AppError('Unable to find file with that id', 400);
     }
   }
 
-  async findFolderByName(folderName: string): Promise<Folder> {
-    try {
-      const options: FindOneOptions<Folder> = {
-        where: {
-          name: folderName,
-          is_active: true,
-        },
-      };
-
-      const folder = await this.folderRepository.findOne(options);
-
-      if (!folder)
-        throw new ResourceNotFoundException(
-          'Could not find a folder with that namne'
-        );
-
-      return folder;
-    } catch (error) {
-      log.error('findFolderByName() error', error);
-      throw new AppError(RiseStatusMessage.FAILED, 400);
-    }
-  }
-
   async addFileToFolder(
+    userId: string,
     folderId: string,
     fileId: string
   ): Promise<Folder | null> {
@@ -96,6 +93,7 @@ export class FolderService {
         where: {
           id: folderId,
           is_active: true,
+          owner: { id: userId },
         },
         loadRelationIds: {
           relations: ['files'],
@@ -103,16 +101,22 @@ export class FolderService {
       };
       const folder = await this.folderRepository.findOne(options);
 
-      const file = await this.fileService.findFileById(fileId);
-      if (!folder || !file) {
-        throw new ResourceNotFoundException();
-      }
+      const file = await this.fileService.findFileById(userId, fileId);
+
+      if (!folder || !file) throw new ResourceNotFoundException();
+
+      if (folder.owner.id !== file.owner.id)
+        throw new UnauthorizedException(
+          'You are not authorized to move that file.'
+        );
+
       folder.files.push(file);
+
       return await this.folderRepository.save(folder);
     } catch (error) {
-      log.error('addFileToFolder() error', error);
+      log.error('addFileToFolder() error \n', error);
       throw new AppError(
-        error.message || RiseStatusMessage.FAILED,
+        error.message || RiseVestStatusMsg.FAILED,
         error.status || 400
       );
     }

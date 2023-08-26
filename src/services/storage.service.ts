@@ -34,8 +34,8 @@ export class StorageService {
 
       try {
         await s3.upload(params).promise();
-        return fileKey;
         log.info(`File ${data.filename} uploaded successfully.`);
+        return fileKey;
       } catch (error) {
         log.error(`Error uploading ${data.filename}:`, error);
         return;

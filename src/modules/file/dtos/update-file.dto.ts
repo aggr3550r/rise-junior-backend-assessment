@@ -12,18 +12,18 @@ import { CreateFileDTO } from './create-file.dto';
 export class UpdateFileDTO extends CreateFileDTO {
   @IsOptional()
   @IsEnum(FileFlag)
-  file_flag: FileFlag;
+  file_flag?: FileFlag;
 
   @IsOptional()
   @IsNumber()
   @IsPositive()
-  admin_review_count: number;
+  unsafe_count?: number;
 
   @IsOptional()
   @IsBoolean()
-  is_active: boolean = true;
+  is_active?: boolean = true;
 
   @IsOptional()
   @IsString()
-  file_download_link: string;
+  file_download_link?: string;
 }
