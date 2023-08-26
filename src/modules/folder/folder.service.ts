@@ -6,6 +6,9 @@ import { AppError } from '../../exceptions/AppError';
 import logger from '../../utils/logger.util';
 import { RiseStatusMessage } from '../../enums/rise-response.enum';
 import { FileService } from '../file/file.service';
+import { PageDTO } from '../../paging/page.dto';
+import { GetFolderOptionsDTO } from './dtos/get-folder-options.dto';
+import { PageMetaDTO } from '../../paging/page-meta.dto';
 
 const log = logger.getLogger();
 export class FolderService {
@@ -112,6 +115,30 @@ export class FolderService {
         error.message || RiseStatusMessage.FAILED,
         error.status || 400
       );
+    }
+  }
+
+  async getFoldersForUser(
+    userId: string,
+    getFolderOptionsDTO: GetFolderOptionsDTO
+  ): Promise<PageDTO<Folder>> {
+    try {
+      const [items, count] = await this.folderRepository.findAndCount({
+        where: { owner: { id: userId } },
+        relations: ['files'], // Include related files
+        skip: getFolderOptionsDTO?.skip,
+        take: getFolderOptionsDTO?.take,
+      });
+
+      const pageMetaDTO = new PageMetaDTO({
+        page_options_dto: getFolderOptionsDTO,
+        total_items: count,
+      });
+
+      return new PageDTO(items, pageMetaDTO);
+    } catch (error) {
+      log.error('getFoldersForUser() error', error);
+      throw new AppError('Failed to fetch folders for user.', error);
     }
   }
 }

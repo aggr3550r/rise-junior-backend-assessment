@@ -9,11 +9,18 @@ import { PageOptionsDTO } from '../../paging/page-option.dto';
 import { PageMetaDTO } from '../../paging/page-meta.dto';
 import { PageDTO } from '../../paging/page.dto';
 import { UserAlreadyExistsException } from '../../exceptions/UserAlreadyExistsException';
+import { GetFileOptionsPageDTO } from '../file/dtos/get-file-options.dto';
+import { FileService } from '../file/file.service';
+import { File } from '../file/entities/file.model';
+import { Folder } from 'aws-sdk/clients/storagegateway';
 
 const log = logger.getLogger();
 
 export class UserService {
-  constructor(private userRepository: Repository<User>) {
+  constructor(
+    private userRepository: Repository<User>,
+    private readonly fileService: FileService
+  ) {
     this.userRepository = getRepository(User);
   }
 
@@ -89,7 +96,10 @@ export class UserService {
 
       await this.userRepository.save(user);
       return true;
-    } catch (error) {}
+    } catch (error) {
+      log.error('deleteUser() error', error);
+      throw new AppError(RiseStatusMessage.FAILED, 400);
+    }
   }
 
   async getUserById(id: string): Promise<User> {
@@ -114,6 +124,23 @@ export class UserService {
       return new PageDTO(items, pageMetaDTO);
     } catch (error) {
       log.error('getAllUsers() error', error);
+      throw new AppError(RiseStatusMessage.FAILED, 400);
+    }
+  }
+
+  async getFilesForUser(
+    getFileOptionsPageDTO: GetFileOptionsPageDTO
+  ): Promise<PageDTO<File>> {
+    try {
+      const paginatedFiles: PageDTO<File> =
+        await this.fileService.getFilesForUser(getFileOptionsPageDTO);
+
+      log.info('** Successfully fetched files ** \n', paginatedFiles);
+
+      return paginatedFiles;
+    } catch (error) {
+      log.error('getFilesForUser() error', error);
+      throw new AppError(RiseStatusMessage.FAILED, 400);
     }
   }
 }
