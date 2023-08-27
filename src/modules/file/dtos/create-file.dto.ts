@@ -1,11 +1,5 @@
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
-import { User } from '../../user/entities/user.model';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { User } from '../../user/entities/user.entity';
 
 export class CreateFileDTO {
   // user chosen image filename without extension

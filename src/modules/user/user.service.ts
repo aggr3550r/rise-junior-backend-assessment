@@ -1,5 +1,5 @@
 import { FindOneOptions, Repository, getRepository } from 'typeorm';
-import { User } from './entities/user.model';
+import { User } from './entities/user.entity';
 import { CreateUserDTO } from './dtos/create-user.dto';
 import { UpdateUserDTO } from './dtos/update-user.dto';
 import logger from '../../utils/logger.util';
@@ -19,7 +19,13 @@ export default class UserService {
 
   async createUser(data: CreateUserDTO): Promise<User> {
     try {
-      const userAlreadyExists = await this.findUserByEmail(data.email);
+      const options: FindOneOptions<User> = {
+        where: {
+          email: data.email,
+          is_active: true,
+        },
+      };
+      const userAlreadyExists = await this.userRepository.findOne(options);
 
       if (userAlreadyExists) {
         throw new UserAlreadyExistsException();
@@ -29,8 +35,7 @@ export default class UserService {
       return await this.userRepository.save(newUser);
     } catch (error) {
       log.error('createUser() error', error);
-      log.info('*** GETTING ERROR ***');
-      console.error(' *** PRINTING STATUS CODE ***', error.message);
+
       throw new AppError(
         error?.message || RiseVestStatusMsg.FAILED,
         error.statusCode

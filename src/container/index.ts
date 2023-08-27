@@ -1,15 +1,15 @@
 /**
  * This file serves as the dependency injection (DI) container for the application.
- *  NestJS creates something like this for us on its own when our application bootstraps so we don't have to but we have to it manually in Express.
+ *  NestJS creates something like this for us on its own when our application bootstraps so we don't have to but we have to do it manually in Express.
  */
 
 import { Repository, getRepository } from 'typeorm';
-import { User } from '../modules/user/entities/user.model';
-import { Folder } from '../modules/folder/entities/folder.model';
+import { User } from '../modules/user/entities/user.entity';
+import { Folder } from '../modules/folder/entities/folder.entity';
 import UserService from '../modules/user/user.service';
 import FileService from '../modules/file/file.service';
 import StorageService from '../services/storage.service';
-import { File } from '../modules/file/entities/file.model';
+import { File } from '../modules/file/entities/file.entity';
 import FolderService from '../modules/folder/folder.service';
 import AuthService from '../modules/user/auth/auth.service';
 import UserController from '../modules/user/user.controller';

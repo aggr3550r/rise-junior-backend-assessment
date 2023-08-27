@@ -3,7 +3,7 @@ import { randomBytes, scrypt as _scrypt } from 'crypto';
 import * as JWT from 'jsonwebtoken';
 import { AppError } from '../exceptions/AppError';
 import { ResourceNotFoundException } from '../exceptions/ResourceNotFound';
-import { User } from '../modules/user/entities/user.model';
+import { User } from '../modules/user/entities/user.entity';
 import logger from './logger.util';
 import { JWTException } from '../exceptions/JWTException';
 

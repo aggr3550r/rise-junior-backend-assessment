@@ -6,19 +6,18 @@ import helmet from 'helmet';
 import { createConnection } from 'typeorm';
 import logger from './utils/logger.util';
 import { configService } from './config/config.service';
-import AllExceptionsFilter from './filters/app-exception.filter';
-
-import * as ref from 'reflect-metadata';
+import 'reflect-metadata';
 
 createConnection(configService.getTypeOrmConfig())
   .then(() => {
     console.log('*** -----  Database connected ----- ***');
   })
   .catch((error) => {
-    console.error('Unable to connect to the database:', error);
+    console.error('!!! Unable to connect to the database !!! \n %o', error);
   });
 
 import routes from './routes';
+import AllExceptionsFilter from './filters/app-exception.filter';
 
 const app = express();
 
@@ -40,6 +39,7 @@ app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 app.use('/api/v1', routes);
 
 // Middleware that captures and handles all uncaught exceptions
+
 app.use(AllExceptionsFilter);
 
 export { app };

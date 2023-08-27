@@ -1,6 +1,6 @@
 import { Entity, Column, ManyToOne } from 'typeorm';
-import { Folder } from '../../folder/entities/folder.model';
-import { User } from '../../user/entities/user.model';
+import { Folder } from '../../folder/entities/folder.entity';
+import { User } from '../../user/entities/user.entity';
 import { FileFlag } from '../../../enums/file-flag.enum';
 import { BaseModel } from '../../../models/utility/ BaseModel';
 import { AdminReviewComment } from '../../../enums/admin-review-comment.enum';

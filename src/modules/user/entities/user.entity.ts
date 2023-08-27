@@ -1,6 +1,6 @@
 import { Entity, Column, OneToMany } from 'typeorm';
-import { File } from '../../file/entities/file.model';
-import { Folder } from '../../folder/entities/folder.model';
+import { File } from '../../file/entities/file.entity';
+import { Folder } from '../../folder/entities/folder.entity';
 import { UserRole } from '../../../enums/user-role.enum';
 import { BaseModel } from '../../../models/utility/ BaseModel';
 

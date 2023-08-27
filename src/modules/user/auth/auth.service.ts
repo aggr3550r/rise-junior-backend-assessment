@@ -1,13 +1,12 @@
 import { Response } from 'express';
 import SecurityUtil from '../../../utils/security.util';
-import { User } from '../entities/user.model';
+import { User } from '../entities/user.entity';
 import UserService from '../user.service';
 import logger from '../../../utils/logger.util';
 import { CreateUserDTO } from '../dtos/create-user.dto';
 import { AppError } from '../../../exceptions/AppError';
 import { LoginDTO } from '../dtos/login-dto';
 import { ResourceNotFoundException } from '../../../exceptions/ResourceNotFound';
-import { ResponseModel } from '../../../models/utility/ResponseModel';
 import { HttpStatus } from '../../../enums/http-status.enum';
 
 const log = logger.getLogger();
@@ -17,6 +16,7 @@ export default class AuthService {
 
   /**
    * This method creates a JWT token to be sent to the client which it will use to make subsequent requests to protected routes.
+   * It essentially simulates logging a user into the app.
    * @param user
    * @param statusCode
    * @param res
@@ -44,22 +44,21 @@ export default class AuthService {
       // Remove password from output
       user.password = undefined;
 
-      log.info(token);
+      res.status(statusCode).json({
+        statusCode: HttpStatus.OK,
+        message: 'Successfully logged in.',
+        data: {
+          token,
+          user,
+        },
+      });
 
-      // res.status(statusCode).json({
-      //   status: RiseVestStatusMsg.SUCCESS,
+      // return new ResponseModel(HttpStatus.OK, 'User successfully logged in', {
       //   token,
       //   data: {
       //     user,
       //   },
       // });
-
-      return new ResponseModel(HttpStatus.OK, 'User successfully logged in', {
-        token,
-        data: {
-          user,
-        },
-      });
     } catch (error) {
       log.error('createAndSendAuthToken() error', error);
       throw new AppError(

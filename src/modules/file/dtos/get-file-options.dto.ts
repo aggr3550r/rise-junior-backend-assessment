@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsOptional } from 'class-validator';
 import { PageOptionsDTO } from '../../../paging/page-option.dto';
 
 export class GetFileOptionsPageDTO extends PageOptionsDTO {

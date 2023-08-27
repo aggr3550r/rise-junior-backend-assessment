@@ -1,6 +1,6 @@
 import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
-import { User } from '../../user/entities/user.model';
-import { File } from '../../file/entities/file.model';
+import { User } from '../../user/entities/user.entity';
+import { File } from '../../file/entities/file.entity';
 import { BaseModel } from '../../../models/utility/ BaseModel';
 
 @Entity('folder')

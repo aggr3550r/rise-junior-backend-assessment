@@ -9,7 +9,7 @@ import FileUtil from '../../utils/file.util';
 import { AppError } from '../../exceptions/AppError';
 import logger from '../../utils/logger.util';
 import { RiseVestStatusMsg } from '../../enums/rise-response.enum';
-import { File } from './entities/file.model';
+import { File } from './entities/file.entity';
 import { ResourceAlreadyExistsException } from '../../exceptions/ResourceAlreadyExistsException';
 import { UploadFileDTO } from './dtos/upload-file.dto';
 import { UpdateFileDTO } from './dtos/update-file.dto';

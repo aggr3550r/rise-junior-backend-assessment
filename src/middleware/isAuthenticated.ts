@@ -1,8 +1,10 @@
 import { NextFunction } from 'express';
 import SecurityUtil from '../utils/security.util';
 import { getRepository } from 'typeorm';
-import { User } from '../modules/user/entities/user.model';
+import { User } from '../modules/user/entities/user.entity';
 import { UnauthorizedException } from '../exceptions/UnauthorizedException';
+import { ResponseModel } from '../models/utility/ResponseModel';
+import { HttpStatus } from '../enums/http-status.enum';
 
 module.exports = async (req: any, res: any, next: NextFunction) => {
   const userRepo = getRepository(User);
@@ -18,7 +20,11 @@ module.exports = async (req: any, res: any, next: NextFunction) => {
   }
 
   if (!token) {
-    throw new UnauthorizedException('User not currently logged in!');
+    return res.status(401).json({
+      statusCode: HttpStatus.UNAUTHORIZED,
+      message: 'User not currently logged in!',
+      data: null,
+    });
   }
 
   const payload: any = await SecurityUtil.verifyTokenWithSecret(

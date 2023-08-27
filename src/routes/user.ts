@@ -10,7 +10,7 @@ userRouter.addPattern(
 );
 
 userRouter.addIsAuthenticatedPattern(
-  HttpMethod.PUT,
+  HttpMethod.PATCH,
   '/',
   userController.updateUser.bind(userController)
 );

@@ -3,7 +3,7 @@ import { RiseVestStatusMsg } from '../../enums/rise-response.enum';
 import { ResponseModel } from '../../models/utility/ResponseModel';
 
 import AuthService from './auth/auth.service';
-import { User } from './entities/user.model';
+import { User } from './entities/user.entity';
 import UserService from './user.service';
 
 export default class UserController {

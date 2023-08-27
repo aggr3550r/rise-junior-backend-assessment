@@ -53,4 +53,5 @@ export const HttpMethod = {
   POST: 'post',
   PUT: 'put',
   DELETE: 'delete',
+  PATCH: 'patch',
 };

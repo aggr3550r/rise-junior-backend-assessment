@@ -1,5 +1,5 @@
 import { FindOneOptions, Repository, getRepository } from 'typeorm';
-import { Folder } from './entities/folder.model';
+import { Folder } from './entities/folder.entity';
 import UserService from '../user/user.service';
 import { ResourceNotFoundException } from '../../exceptions/ResourceNotFound';
 import { AppError } from '../../exceptions/AppError';
