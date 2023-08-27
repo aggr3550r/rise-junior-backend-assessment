@@ -2,11 +2,11 @@ import { HttpStatus } from '../../enums/http-status.enum';
 import { RiseVestStatusMsg } from '../../enums/rise-response.enum';
 import { ResponseModel } from '../../models/utility/ResponseModel';
 
-import { AuthService } from './auth/auth.service';
+import AuthService from './auth/auth.service';
 import { User } from './entities/user.model';
-import { UserService } from './user.service';
+import UserService from './user.service';
 
-export class UserController {
+export default class UserController {
   constructor(
     private userService: UserService,
     private authService: AuthService
@@ -32,7 +32,7 @@ export class UserController {
 
   async updateUser(request: any) {
     try {
-      const { id } = request.params;
+      const { id } = request.auth;
       const data = request.body;
 
       const serviceResponse = await this.userService.updateUser(id, data);
@@ -53,7 +53,7 @@ export class UserController {
 
   async deleteUser(request: any) {
     try {
-      const { id } = request.params;
+      const { id } = request.auth;
 
       await this.userService.deleteUser(id);
 
@@ -75,6 +75,26 @@ export class UserController {
       const user = await this.userService.getUserById(id);
 
       return new ResponseModel(HttpStatus.OK, RiseVestStatusMsg.SUCCESS, user);
+    } catch (error) {
+      return new ResponseModel(
+        error?.status || HttpStatus.BAD_REQUEST,
+        error?.message || RiseVestStatusMsg.FAILED,
+        null
+      );
+    }
+  }
+
+  async getAllUsers(request: any) {
+    try {
+      const queryOptions = request.query;
+
+      const serviceResponse = await this.userService.getAllUsers(queryOptions);
+
+      return new ResponseModel(
+        HttpStatus.OK,
+        RiseVestStatusMsg.SUCCESS,
+        serviceResponse
+      );
     } catch (error) {
       return new ResponseModel(
         error?.status || HttpStatus.BAD_REQUEST,

@@ -6,11 +6,11 @@ import { CreateFileDTO } from './dtos/create-file.dto';
 import { GetFileOptionsPageDTO } from './dtos/get-file-options.dto';
 import { UpdateFileDTO } from './dtos/update-file.dto';
 import { UploadFileDTO } from './dtos/upload-file.dto';
-import { FileService } from './file.service';
+import FileService from './file.service';
 
 const log = logger.getLogger();
 
-export class FileController {
+export default class FileController {
   constructor(private fileService: FileService) {}
 
   async uploadFile(request: any) {

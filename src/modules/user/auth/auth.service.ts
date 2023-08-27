@@ -1,8 +1,7 @@
 import { Response } from 'express';
 import SecurityUtil from '../../../utils/security.util';
 import { User } from '../entities/user.model';
-import { UserService } from '../user.service';
-import { RiseVestStatusMsg } from '../../../enums/rise-response.enum';
+import UserService from '../user.service';
 import logger from '../../../utils/logger.util';
 import { CreateUserDTO } from '../dtos/create-user.dto';
 import { AppError } from '../../../exceptions/AppError';
@@ -13,7 +12,7 @@ import { HttpStatus } from '../../../enums/http-status.enum';
 
 const log = logger.getLogger();
 
-export class AuthService {
+export default class AuthService {
   constructor(private userService: UserService) {}
 
   /**

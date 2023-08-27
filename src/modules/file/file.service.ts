@@ -25,7 +25,7 @@ import { QueryType } from '../../enums/query-type.enum';
 
 const log = logger.getLogger();
 
-export class FileService {
+export default class FileService {
   constructor(
     private fileRepository: Repository<File>,
     private storageService: StorageService,

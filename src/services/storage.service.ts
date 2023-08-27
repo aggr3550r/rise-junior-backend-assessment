@@ -18,7 +18,7 @@ AWS.config.update({
 // Create S3 instance
 const s3 = new AWS.S3();
 
-export class StorageService {
+export default class StorageService {
   async uploadFileToS3(data: UploadFileDTO) {
     try {
       const fileKey = this.constructS3FileKey(data);

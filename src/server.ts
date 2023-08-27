@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import { createConnection } from 'typeorm';
 import logger from './utils/logger.util';
 import { configService } from './config/config.service';
+import * as ref from 'reflect-metadata';
 const app = express();
 
 createConnection(configService.getTypeOrmConfig())

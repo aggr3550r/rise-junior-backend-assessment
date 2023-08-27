@@ -1,9 +1,9 @@
 import { HttpStatus } from '../../enums/http-status.enum';
 import { RiseVestStatusMsg } from '../../enums/rise-response.enum';
 import { ResponseModel } from '../../models/utility/ResponseModel';
-import { FolderService } from './folder.service';
+import FolderService from './folder.service';
 
-export class FolderController {
+export default class FolderController {
   constructor(private folderService: FolderService) {}
 
   async createFolder(request: any) {

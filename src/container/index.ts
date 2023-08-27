@@ -6,16 +6,16 @@
 import { Repository, getRepository } from 'typeorm';
 import { User } from '../modules/user/entities/user.model';
 import { Folder } from '../modules/folder/entities/folder.model';
-import { UserService } from '../modules/user/user.service';
-import { FileService } from '../modules/file/file.service';
-import { StorageService } from '../services/storage.service';
+import UserService from '../modules/user/user.service';
+import FileService from '../modules/file/file.service';
+import StorageService from '../services/storage.service';
 import { File } from '../modules/file/entities/file.model';
-import { FolderService } from '../modules/folder/folder.service';
-import { AuthService } from '../modules/user/auth/auth.service';
-import { UserController } from '../modules/user/user.controller';
-import { AuthController } from '../modules/user/auth/auth.controller';
-import { FileController } from '../modules/file/file.controller';
-import { FolderController } from '../modules/folder/folder.controller';
+import FolderService from '../modules/folder/folder.service';
+import AuthService from '../modules/user/auth/auth.service';
+import UserController from '../modules/user/user.controller';
+import AuthController from '../modules/user/auth/auth.controller';
+import FileController from '../modules/file/file.controller';
+import FolderController from '../modules/folder/folder.controller';
 
 /**
  * @author aggr3550r

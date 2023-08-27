@@ -1,5 +1,5 @@
-const base = require('../base');
 const { default: logger } = require('../utils/logger');
+const { Redirect } = require('../utils/redirect');
 
 module.exports = (controller) => async (request, response) => {
   try {
@@ -8,7 +8,7 @@ module.exports = (controller) => async (request, response) => {
     if (!data) {
       return;
     }
-    if (data instanceof base.Redirect) {
+    if (data instanceof Redirect) {
       return response.redirect(data.route);
     }
     response.status(data.status).send(data.message);

@@ -12,7 +12,7 @@ import { UserAlreadyExistsException } from '../../exceptions/UserAlreadyExistsEx
 
 const log = logger.getLogger();
 
-export class UserService {
+export default class UserService {
   constructor(private userRepository: Repository<User>) {
     this.userRepository = getRepository(User);
   }
@@ -120,20 +120,4 @@ export class UserService {
       throw new AppError(RiseVestStatusMsg.FAILED, 400);
     }
   }
-
-  // async getFilesForUser(
-  //   getFileOptionsPageDTO: GetFileOptionsPageDTO
-  // ): Promise<PageDTO<File>> {
-  //   try {
-  //     const paginatedFiles: PageDTO<File> =
-  //       await this.fileService.getFilesForUser(getFileOptionsPageDTO);
-
-  //     log.info('** Successfully fetched files ** \n', paginatedFiles);
-
-  //     return paginatedFiles;
-  //   } catch (error) {
-  //     log.error('getFilesForUser() error', error);
-  //     throw new AppError(RiseVestStatusMsg.FAILED, 400);
-  //   }
-  // }
 }

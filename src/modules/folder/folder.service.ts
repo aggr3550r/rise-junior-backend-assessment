@@ -1,18 +1,18 @@
 import { FindOneOptions, Repository, getRepository } from 'typeorm';
 import { Folder } from './entities/folder.model';
-import { UserService } from '../user/user.service';
+import UserService from '../user/user.service';
 import { ResourceNotFoundException } from '../../exceptions/ResourceNotFound';
 import { AppError } from '../../exceptions/AppError';
 import logger from '../../utils/logger.util';
 import { RiseVestStatusMsg } from '../../enums/rise-response.enum';
-import { FileService } from '../file/file.service';
+import FileService from '../file/file.service';
 import { PageDTO } from '../../paging/page.dto';
 import { GetFolderOptionsDTO } from './dtos/get-folder-options.dto';
 import { PageMetaDTO } from '../../paging/page-meta.dto';
 import { UnauthorizedException } from '../../exceptions/UnauthorizedException';
 
 const log = logger.getLogger();
-export class FolderService {
+export default class FolderService {
   constructor(
     private folderRepository: Repository<Folder>,
     private readonly userService: UserService,

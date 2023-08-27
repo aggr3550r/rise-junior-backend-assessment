@@ -18,6 +18,7 @@
     "typeRoots": ["src/typings"],
     "baseUrl": ".",
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
       "*": ["node_modules/*"]
     }

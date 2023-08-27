@@ -1,9 +1,9 @@
 import { HttpStatus } from '../../../enums/http-status.enum';
 import { RiseVestStatusMsg } from '../../../enums/rise-response.enum';
 import { ResponseModel } from '../../../models/utility/ResponseModel';
-import { AuthService } from './auth.service';
+import AuthService from './auth.service';
 
-export class AuthController {
+export default class AuthController {
   constructor(private authService: AuthService) {}
 
   async login(request: any, response: any) {
