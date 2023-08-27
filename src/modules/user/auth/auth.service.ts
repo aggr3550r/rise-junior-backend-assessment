@@ -23,7 +23,7 @@ export default class AuthService {
    */
   async createAndSendAuthToken(user: User, statusCode: number, res: Response) {
     try {
-      const token = await SecurityUtil.generateTokenWithSecretAndId(user.id);
+      const token = await SecurityUtil.generateTokenWithSecret(user);
 
       const cookieOptions: any = {
         expires: new Date(
@@ -71,12 +71,13 @@ export default class AuthService {
 
   async signup(data: CreateUserDTO) {
     try {
-      let { email, password } = data;
+      let { email, password, full_name } = data;
       password = await SecurityUtil.encryptPassword(password);
 
       const userData: CreateUserDTO = {
         email,
         password,
+        full_name,
       };
 
       return await this.userService.createUser(userData);
@@ -84,7 +85,7 @@ export default class AuthService {
       log.error('signup() error', error);
       throw new AppError(
         error?.message || 'Could not complete user signup.',
-        error?.status || 400
+        error?.statusCode || 400
       );
     }
   }

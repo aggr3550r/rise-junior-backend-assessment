@@ -29,7 +29,12 @@ export default class UserService {
       return await this.userRepository.save(newUser);
     } catch (error) {
       log.error('createUser() error', error);
-      throw new AppError(RiseVestStatusMsg.FAILED, 400);
+      log.info('*** GETTING ERROR ***');
+      console.error(' *** PRINTING STATUS CODE ***', error.message);
+      throw new AppError(
+        error?.message || RiseVestStatusMsg.FAILED,
+        error.statusCode
+      );
     }
   }
 

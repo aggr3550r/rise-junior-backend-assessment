@@ -6,16 +6,21 @@ import helmet from 'helmet';
 import { createConnection } from 'typeorm';
 import logger from './utils/logger.util';
 import { configService } from './config/config.service';
+import AllExceptionsFilter from './filters/app-exception.filter';
+
 import * as ref from 'reflect-metadata';
-const app = express();
 
 createConnection(configService.getTypeOrmConfig())
   .then(() => {
-    console.log('Database connected');
+    console.log('*** -----  Database connected ----- ***');
   })
   .catch((error) => {
     console.error('Unable to connect to the database:', error);
   });
+
+import routes from './routes';
+
+const app = express();
 
 app.use(logger.getMiddleware());
 
@@ -32,6 +37,9 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 
-// app.use('/api/v1', routes);
+app.use('/api/v1', routes);
+
+// Middleware that captures and handles all uncaught exceptions
+app.use(AllExceptionsFilter);
 
 export { app };

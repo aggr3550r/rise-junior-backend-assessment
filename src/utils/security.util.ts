@@ -11,8 +11,9 @@ const scrypt = promisify(_scrypt);
 const log = logger.getLogger();
 
 export default class SecurityUtil {
-  static async generateTokenWithSecretAndId(id: any): Promise<string> {
-    return JWT.sign({ id }, process.env.JWT_SECRET, {
+  static async generateTokenWithSecret(user: User): Promise<string> {
+    const { id, role } = user;
+    return JWT.sign({ id, role }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN,
     });
   }

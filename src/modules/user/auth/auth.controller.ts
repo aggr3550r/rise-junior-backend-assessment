@@ -29,10 +29,11 @@ export default class AuthController {
 
   async signup(request: any) {
     try {
-      const { email, password } = request.body;
+      const { email, password, full_name } = request.body;
       const serviceResponse = await this.authService.signup({
         email,
         password,
+        full_name,
       });
 
       return new ResponseModel(

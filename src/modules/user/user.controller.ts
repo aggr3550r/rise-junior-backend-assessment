@@ -14,8 +14,12 @@ export default class UserController {
 
   async registerUser(request: any): Promise<ResponseModel<User>> {
     try {
-      const { email, password } = request.body;
-      const data = await this.authService.signup({ email, password });
+      const { email, password, full_name } = request.body;
+      const data = await this.authService.signup({
+        email,
+        password,
+        full_name,
+      });
       return new ResponseModel(
         HttpStatus.CREATED,
         'User successfully created',
@@ -23,8 +27,8 @@ export default class UserController {
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
-        error?.message || 'Error occurred while updating user.',
+        error?.statusCode || HttpStatus.BAD_REQUEST,
+        error?.message || 'Error occurred while creating user',
         null
       );
     }
@@ -45,7 +49,7 @@ export default class UserController {
     } catch (error) {
       return new ResponseModel(
         error?.status || HttpStatus.BAD_REQUEST,
-        RiseVestStatusMsg.FAILED,
+        error?.message || RiseVestStatusMsg.FAILED,
         null
       );
     }
@@ -63,7 +67,7 @@ export default class UserController {
     } catch (error) {
       return new ResponseModel(
         error?.status || HttpStatus.BAD_REQUEST,
-        RiseVestStatusMsg.FAILED,
+        error?.message || RiseVestStatusMsg.FAILED,
         null
       );
     }

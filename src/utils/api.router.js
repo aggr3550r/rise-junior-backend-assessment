@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import make from '../services/make';
-import authenticated from '../middleware/is-authenticated';
-import account from '../middleware/is-account';
+import authenticated from '../middleware/isAuthenticated';
+import account from '../middleware/isAccount';
+
 
 export default class ApiRouter {
   router;

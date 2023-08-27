@@ -36,6 +36,7 @@ class ConfigService {
 
   public getTypeOrmConfig(): DataSourceOptions {
     return {
+      name: 'default',
       type: 'postgres',
       host: this.getValue('PG_HOST'),
       port: parseInt(this.getValue('PG_PORT')),

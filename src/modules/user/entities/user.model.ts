@@ -13,7 +13,7 @@ export class User extends BaseModel {
   password: string;
 
   @Column()
-  fullName: string;
+  full_name: string;
 
   @Column({
     nullable: false,

@@ -18,9 +18,9 @@ import { PageMetaDTO } from '../../paging/page-meta.dto';
 import { PageDTO } from '../../paging/page.dto';
 import { GetFileOptionsPageDTO } from './dtos/get-file-options.dto';
 import { ReviewFileDTO } from './dtos/review-file.dto';
-import { StorageService } from '../../services/storage.service';
+import StorageService from '../../services/storage.service';
 import { FileFlag } from '../../enums/file-flag.enum';
-import { UserService } from '../user/user.service';
+import UserService from '../user/user.service';
 import { QueryType } from '../../enums/query-type.enum';
 
 const log = logger.getLogger();
