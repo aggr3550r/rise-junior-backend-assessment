@@ -38,20 +38,6 @@ In order to run the app, the first thing you need to do is clone the code into y
 With that out of the way, there are two possible paths along which to proceed enumerated below:
 ### * Dockerfile
 
-#### Docker Compose 
-To run the app using _docker compose_ take the following steps:
-- Setup:
-  Fire up Docker Desktop to make sure that the Docker daemon is up and running
-
-- Build docker image:
-  Run the following command in the terminal from the root directory of the project: 
-```
-docker-compose --build
-```
-
-- Start docker container:
-  Run the following command in the terminal from the root directory of the project.
-
 #### Dockerfile
 To run the app using the Dockerfile provided, take the following steps:
 - Setup:
@@ -72,7 +58,13 @@ To run the app using the Dockerfile provided, take the following steps:
  ```
  docker run -p 8000:80 -v /Users/victor/Desktop/rise-junior-backend-assessment/.env:/app/.env rise-image:01
  ```
-That should do it, your Todo API is up and ready for use @ http://localhost:8000/api/v1 ! 
+That should do it, your Cloud Backup API is up and ready for use @ http://localhost:8000/api/v1 ! 
+
+#### To run the app without Docker
+```bash
+# start server
+$ npm run start
+```
 
 ## Test
 
