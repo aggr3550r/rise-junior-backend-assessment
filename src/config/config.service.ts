@@ -50,6 +50,9 @@ class ConfigService {
         // autoLoadEntities: true,
         synchronize: true,
         migrationsRun: true,
+        ssl: {
+          rejectUnauthorized: true,
+        },
       };
     } else
       return {
@@ -69,6 +72,9 @@ class ConfigService {
         // autoLoadEntities: true,
         synchronize: true,
         migrationsRun: true,
+        ssl: {
+          rejectUnauthorized: true,
+        },
       };
   }
 }
