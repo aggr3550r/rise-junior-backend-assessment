@@ -16,7 +16,7 @@ class ConfigService {
   }
 
   public ensureValues(keys: string[]) {
-    keys.forEach((k) => this.getValue(k, true));
+    keys.forEach((k) => this.getValue(k, false));
     return this;
   }
 
@@ -35,24 +35,41 @@ class ConfigService {
   }
 
   public getTypeOrmConfig(): DataSourceOptions {
-    return {
-      name: 'default',
-      type: 'postgres',
-      host: this.getValue('PG_HOST'),
-      port: parseInt(this.getValue('PG_PORT')),
-      username: this.getValue('PG_USER'),
-      password: this.getValue('PG_PASSWORD'),
-      database: this.getValue('PG_DATABASE'),
-      entities: [
-        __dirname + '/../**/*.entity{.ts,.js}',
-        __dirname + '/../**/*.repository{.ts,.js}',
-      ],
-      migrationsTableName: 'migration',
-      migrations: [__dirname + 'src/migration/*.ts'],
-      // autoLoadEntities: true,
-      synchronize: true,
-      migrationsRun: true,
-    };
+    const databaseUrl = this.getValue('DATABASE_URL');
+    if (databaseUrl) {
+      return {
+        name: 'default',
+        type: 'postgres',
+        url: this.getValue('DATABASE_URL'),
+        entities: [
+          __dirname + '/../**/*.entity{.ts,.js}',
+          __dirname + '/../**/*.repository{.ts,.js}',
+        ],
+        migrationsTableName: 'migration',
+        migrations: [__dirname + 'src/migration/*.ts'],
+        // autoLoadEntities: true,
+        synchronize: true,
+        migrationsRun: true,
+      };
+    } else
+      return {
+        name: 'default',
+        type: 'postgres',
+        host: this.getValue('PG_HOST'),
+        port: parseInt(this.getValue('PG_PORT')),
+        username: this.getValue('PG_USER'),
+        password: this.getValue('PG_PASSWORD'),
+        database: this.getValue('PG_DATABASE'),
+        entities: [
+          __dirname + '/../**/*.entity{.ts,.js}',
+          __dirname + '/../**/*.repository{.ts,.js}',
+        ],
+        migrationsTableName: 'migration',
+        migrations: [__dirname + 'src/migration/*.ts'],
+        // autoLoadEntities: true,
+        synchronize: true,
+        migrationsRun: true,
+      };
   }
 }
 

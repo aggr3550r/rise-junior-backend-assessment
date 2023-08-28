@@ -5,7 +5,6 @@ import {
   getRepository,
 } from 'typeorm';
 import { CreateFileDTO } from './dtos/create-file.dto';
-import FileUtil from '../../utils/file.util';
 import { AppError } from '../../exceptions/AppError';
 import logger from '../../utils/logger.util';
 import { RiseVestStatusMsg } from '../../enums/rise-response.enum';
@@ -22,7 +21,6 @@ import StorageService from '../../services/storage.service';
 import { FileFlag } from '../../enums/file-flag.enum';
 import UserService from '../user/user.service';
 import { QueryType } from '../../enums/query-type.enum';
-import user from '../../routes/user';
 
 const log = logger.getLogger();
 
@@ -59,8 +57,6 @@ export default class FileService {
       }
 
       data.owner = owner;
-
-      console.log('CREATING FILE', data);
 
       const newFile = this.fileRepository.create(data);
       return await this.fileRepository.save(newFile);
