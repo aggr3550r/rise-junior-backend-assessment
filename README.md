@@ -11,7 +11,7 @@ The idea of the app is one that allows users to upload files to a remote storage
 
 ## Running the app
 
-In order to run the app, the first thing you need to do is create a .env file in the root of your project. The .env file should be like the one below
+In order to run the app, the first thing you need to do is clone the code into your local machine and then create a .env file in the root of your project. The .env file should be like the one below
 ```bash
 # PG_HOST=XXXXXXXXXXXX
 # PG_PORT=5432
