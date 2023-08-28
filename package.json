@@ -7,11 +7,10 @@
     "start": "cross-env NODE_ENV=development ts-node --files src",
     "build": "tsc",
     "start:dev": "npm run build && cross-env NODE_ENV=development nodemon dist",
-    "test": "cross-env NODE_ENV=test jest --testTimeout=10000 --setupFiles dotenv/config",
-    "test:coverage": "cross-env NODE_ENV=test jest --testTimeout=10000 --setupFiles dotenv/config --coverage",
-    "pretest": "",
-    "pretest:coverage": ""
+    "test": "jest --transformIgnorePatterns \"/node_modules/(?!rise-junior-backend-assessment/)\" --env=jsdom"
   },
+  "pretest": "",
+  "pretest:coverage": "",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -53,17 +52,18 @@
     "uuid": "^9.0.0",
     "winston": "^3.10.0"
   },
-  "jest": {
-    "testEnvironment": "node",
-    "coveragePathIgnorePatterns": [
-      "/node_modules/"
-    ]
-  },
   "devDependencies": {
+    "@babel/core": "^7.22.11",
+    "@babel/preset-env": "^7.22.10",
+    "@babel/preset-modules": "^0.1.6",
     "@types/fluent-ffmpeg": "^2.1.21",
+    "@types/jest": "^29.5.4",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/uuid": "^9.0.2",
+    "babel-jest": "^29.6.4",
     "cross-env": "^7.0.3",
-    "nodemon": "^3.0.1"
+    "jest-environment-jsdom": "^29.6.4",
+    "nodemon": "^3.0.1",
+    "ts-jest": "^29.1.1"
   }
 }

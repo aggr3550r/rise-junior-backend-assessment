@@ -1,5 +1,14 @@
 const request = require('supertest');
-const { app, connection } = require('../server');
+const { app } = require('../server');
+const { default: connection } = require('../database/connection');
+
+beforeAll(async () => {
+  await connection.create();
+});
+
+beforeEach(async () => {
+  await connection.clear();
+});
 
 describe('Register', () => {
   it('should fail because user full_name is missing', async () => {
@@ -106,6 +115,6 @@ describe('Fetch user details', () => {
 });
 
 afterAll(async (done) => {
-  connection.close();
+  connection.destroy();
   done();
 });

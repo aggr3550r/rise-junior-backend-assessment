@@ -78,6 +78,6 @@ describe('Folders', () => {
 });
 
 afterAll(async (done) => {
-  connection.close();
+  connection.destroy();
   done();
 });

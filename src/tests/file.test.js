@@ -1,5 +1,7 @@
 const request = require('supertest');
 
+import * as typeorm from 'typeorm';
+
 const { app, connection } = require('../server');
 const { FileFlag } = require('../enums/file-flag.enum');
 
@@ -77,6 +79,6 @@ describe('Files', () => {
 });
 
 afterAll(async (done) => {
-  connection.close();
+  connection.destroy();
   done();
 });
