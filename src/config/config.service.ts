@@ -79,6 +79,8 @@ class ConfigService {
   }
 }
 
+
+
 const configService = new ConfigService(process.env).ensureValues([
   'PG_HOST',
   'PG_PORT',
