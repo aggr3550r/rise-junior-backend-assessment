@@ -3,14 +3,14 @@ import ApiRouter, { HttpMethod } from '../utils/api.router';
 
 const folderRouter = new ApiRouter();
 
-folderRouter.addPattern(
+folderRouter.addIsAuthenticatedPattern(
   HttpMethod.POST,
   '/',
   folderController.createFolder.bind(folderController)
 );
 
 folderRouter.addIsAuthenticatedPattern(
-  HttpMethod.PUT,
+  HttpMethod.PATCH,
   '/:folderId',
   folderController.updateFolder.bind(folderController)
 );

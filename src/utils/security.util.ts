@@ -57,14 +57,14 @@ export default class SecurityUtil {
       if (storedHash === hash.toString('hex')) {
         return user;
       } else {
-        return;
+        throw new AppError('Password Incorrect', 400);
       }
     } catch (error) {
       log.error('decryptAndVerifyPassword() error \n %o', error);
 
       throw new AppError(
-        'Error occured while trying to verify that password',
-        error
+        error?.message || 'Error occured while trying to verify that password',
+        error?.statusCode || 400
       );
     }
   }

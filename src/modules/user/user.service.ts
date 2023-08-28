@@ -9,6 +9,7 @@ import { PageOptionsDTO } from '../../paging/page-option.dto';
 import { PageMetaDTO } from '../../paging/page-meta.dto';
 import { PageDTO } from '../../paging/page.dto';
 import { UserAlreadyExistsException } from '../../exceptions/UserAlreadyExistsException';
+import { ResourceNotFoundException } from '../../exceptions/ResourceNotFound';
 
 const log = logger.getLogger();
 
@@ -38,7 +39,7 @@ export default class UserService {
 
       throw new AppError(
         error?.message || RiseVestStatusMsg.FAILED,
-        error.statusCode
+        error?.statusCode || 400
       );
     }
   }
@@ -62,6 +63,7 @@ export default class UserService {
           is_active: true,
         },
       };
+
       return await this.userRepository.findOne(options);
     } catch (error) {
       log.error('findUserById() error', error);
@@ -106,7 +108,20 @@ export default class UserService {
   }
 
   async getUserById(id: string): Promise<User> {
-    return await this.findUserById(id);
+    try {
+      const user = await this.findUserById(id);
+
+      if (!user)
+        throw new ResourceNotFoundException("Couldn't find user with that id");
+
+      return user;
+    } catch (error) {
+      log.error('getUser() error', error);
+      throw new AppError(
+        error?.message || RiseVestStatusMsg.FAILED,
+        error?.statusCode || 400
+      );
+    }
   }
 
   async getAllUsers(pageOptionsDTO: PageOptionsDTO): Promise<PageDTO<User>> {
@@ -127,7 +142,10 @@ export default class UserService {
       return new PageDTO(items, pageMetaDTO);
     } catch (error) {
       log.error('getAllUsers() error', error);
-      throw new AppError(RiseVestStatusMsg.FAILED, 400);
+      throw new AppError(
+        error?.message || RiseVestStatusMsg.FAILED,
+        error?.statusCode || 400
+      );
     }
   }
 }

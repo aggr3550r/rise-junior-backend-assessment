@@ -9,6 +9,7 @@ export default class FolderController {
   async createFolder(request: any) {
     try {
       const { id: userId } = request.auth;
+
       const { name } = request.body;
 
       const serviceResponse = await this.folderService.createFolder(
@@ -17,14 +18,14 @@ export default class FolderController {
       );
 
       return new ResponseModel(
-        HttpStatus.OK,
+        HttpStatus.CREATED,
         RiseVestStatusMsg.SUCCESS,
         serviceResponse
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
-        error?.message || 'Failed to upload file.',
+        error?.statusCode || HttpStatus.BAD_REQUEST,
+        error?.message || 'Unable to create folder.',
         null
       );
     }
@@ -49,7 +50,7 @@ export default class FolderController {
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || 'Failed to upload file.',
         null
       );
@@ -61,16 +62,19 @@ export default class FolderController {
       const { id: userId } = request.auth;
       const { folderId } = request.params;
 
-      const serviceResponse = this.folderService.deleteFolder(userId, folderId);
+      const serviceResponse = await this.folderService.deleteFolder(
+        userId,
+        folderId
+      );
 
       return new ResponseModel(
         HttpStatus.OK,
-        RiseVestStatusMsg.SUCCESS,
+        'Folder successfully deleted.',
         serviceResponse
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || RiseVestStatusMsg.FAILED,
         null
       );
@@ -82,7 +86,7 @@ export default class FolderController {
       const { id: userId } = request.auth;
       const { folderId } = request.params;
 
-      const serviceResponse = this.folderService.findFolderById(
+      const serviceResponse = await this.folderService.findFolderById(
         userId,
         folderId
       );
@@ -94,7 +98,7 @@ export default class FolderController {
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || RiseVestStatusMsg.FAILED,
         null
       );
@@ -119,7 +123,7 @@ export default class FolderController {
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || RiseVestStatusMsg.FAILED,
         null
       );
@@ -143,7 +147,7 @@ export default class FolderController {
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || RiseVestStatusMsg.FAILED,
         null
       );

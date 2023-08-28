@@ -104,12 +104,13 @@ export default class AuthService {
         user
       );
 
+
       return verificationResult;
     } catch (error) {
       log.error('login() error', error);
       throw new AppError(
         error?.message || 'Could not complete user login.',
-        error?.status || 400
+        error?.statusCode || 400
       );
     }
     ``;

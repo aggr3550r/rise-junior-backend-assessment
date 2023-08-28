@@ -18,9 +18,10 @@ export default class AuthController {
           response
         );
       }
+
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || 'Error occurred while logging user in.',
         null
       );
@@ -43,7 +44,7 @@ export default class AuthController {
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || 'Error occurred while logging user in.',
         null
       );

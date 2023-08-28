@@ -1,6 +1,7 @@
 import { HttpStatus } from '../../enums/http-status.enum';
 import { RiseVestStatusMsg } from '../../enums/rise-response.enum';
 import { ResponseModel } from '../../models/utility/ResponseModel';
+import { PageDTO } from '../../paging/page.dto';
 
 import AuthService from './auth/auth.service';
 import { User } from './entities/user.entity';
@@ -36,10 +37,10 @@ export default class UserController {
 
   async updateUser(request: any) {
     try {
-      const { id } = request.auth;
+      const { userId } = request.params;
       const data = request.body;
 
-      const serviceResponse = await this.userService.updateUser(id, data);
+      const serviceResponse = await this.userService.updateUser(userId, data);
 
       return new ResponseModel(
         HttpStatus.OK,
@@ -48,7 +49,7 @@ export default class UserController {
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || RiseVestStatusMsg.FAILED,
         null
       );
@@ -66,7 +67,7 @@ export default class UserController {
       });
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || RiseVestStatusMsg.FAILED,
         null
       );
@@ -76,12 +77,13 @@ export default class UserController {
   async getUser(request: any) {
     try {
       const { id } = request.params;
+
       const user = await this.userService.getUserById(id);
 
       return new ResponseModel(HttpStatus.OK, RiseVestStatusMsg.SUCCESS, user);
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || RiseVestStatusMsg.FAILED,
         null
       );
@@ -101,7 +103,7 @@ export default class UserController {
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || RiseVestStatusMsg.FAILED,
         null
       );

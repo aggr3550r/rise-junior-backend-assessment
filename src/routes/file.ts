@@ -21,7 +21,7 @@ fileRouter.addIsAuthenticatedPattern(
 
 fileRouter.addIsAuthenticatedPattern(
   HttpMethod.GET,
-  '/:fileId?/:filename?/download',
+  '/:fileId/download',
   fileController.downloadFile.bind(fileController)
 );
 
@@ -32,7 +32,7 @@ fileRouter.addIsAuthenticatedPattern(
 );
 
 fileRouter.addIsAdminPattern(
-  HttpMethod.PUT,
+  HttpMethod.PATCH,
   '/:fileId',
   fileController.reviewFile.bind(fileController)
 );

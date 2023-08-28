@@ -15,21 +15,22 @@ export default class FileController {
 
   async uploadFile(request: any) {
     try {
-      const filePath = request.file.path;
+      const file = request.file;
       const { id: userId } = request.auth;
       const data: CreateFileDTO = {
-        file_path: filePath,
+        file_path: file.originalname,
+        filename: file.originalname,
+        size: file.size,
       };
 
-      const file = await this.fileService.createFile(userId, data);
+      await this.fileService.createFile(userId, data);
 
       const uploadData: UploadFileDTO = {
         file_path: file.file_path,
-        folder_name: file?.folder.name,
         filename: file.filename,
       };
 
-      await this.fileService.uploadFile(userId, uploadData);
+      await this.fileService.uploadFile(userId, uploadData, file);
 
       log.info('** uploaded file to s3 bucket... **', uploadData);
 
@@ -40,7 +41,7 @@ export default class FileController {
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || 'Failed to upload file.',
         null
       );
@@ -67,7 +68,7 @@ export default class FileController {
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || RiseVestStatusMsg.FAILED,
         null
       );
@@ -76,13 +77,12 @@ export default class FileController {
 
   async downloadFile(request: any) {
     try {
-      const { fileId = '', filename = '' } = request.params;
+      const { fileId } = request.params;
       const { id: userId } = request.auth;
 
       const download_link = await this.fileService.serveDownload(
         userId,
-        fileId,
-        filename
+        fileId
       );
 
       return new ResponseModel(
@@ -92,7 +92,7 @@ export default class FileController {
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || RiseVestStatusMsg.FAILED,
         null
       );
@@ -109,7 +109,7 @@ export default class FileController {
       return new ResponseModel(HttpStatus.OK, RiseVestStatusMsg.SUCCESS, files);
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || RiseVestStatusMsg.FAILED,
         null
       );
@@ -131,7 +131,7 @@ export default class FileController {
       );
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || RiseVestStatusMsg.FAILED,
         null
       );
@@ -148,7 +148,7 @@ export default class FileController {
       return new ResponseModel(HttpStatus.OK, RiseVestStatusMsg.SUCCESS, file);
     } catch (error) {
       return new ResponseModel(
-        error?.status || HttpStatus.BAD_REQUEST,
+        error?.statusCode || HttpStatus.BAD_REQUEST,
         error?.message || RiseVestStatusMsg.FAILED,
         null
       );

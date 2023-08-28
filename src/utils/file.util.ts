@@ -1,55 +1,60 @@
-import FilepathIncompleteException from '../exceptions/FilepathIncompleteException';
-import { SupportedExtension } from '../enums/supported-extension.enum';
-import UnsupportedFileFormatException from '../exceptions/UnsupportedFileFormatException';
-import { CreateFileDTO } from '../modules/file/dtos/create-file.dto';
 import fs from 'fs';
 import logger from './logger.util';
 import { AppError } from '../exceptions/AppError';
-import path from 'path';
+import sharp from 'sharp';
+import ffmpeg from 'fluent-ffmpeg';
+import { Readable } from 'stream';
 
 const log = logger.getLogger();
 
 export default class FileUtil {
-  static sanitizeFilePath(filePath: string) {
+  static async compressImageBuffer(file: any) {
     try {
-      // Perform standardization on filepath
-      filePath = path.normalize(filePath);
-      filePath = path.resolve(filePath);
+      const buffer: Buffer = file.buffer;
+      console.log('*** Hold on, we are compressing your file ***');
 
-      const parsedFilePath = filePath.split('/');
-      const fileIndex = Number(parsedFilePath.length - 1);
-      const fileName = parsedFilePath[fileIndex];
+      const compressedImageBuffer = await sharp(buffer)
+        .resize({ width: 800 }) // Adjust the width as needed
+        .toBuffer();
 
-      const parsedFileName = fileName.split('.');
+      console.log('*** Compression finished ***');
 
-      if (parsedFileName.length < 2) {
-        throw new FilepathIncompleteException();
-      }
-
-      const fileExtension = parsedFileName[1];
-
-      if (!this.isSupportedFileExtension(fileExtension)) {
-        throw new UnsupportedFileFormatException();
-      }
-
-      return {
-        file_path: filePath,
-        filename: fileName,
-        extension: fileExtension,
-      } as Partial<CreateFileDTO>;
+      return compressedImageBuffer;
     } catch (error) {
-      log.error('parseFilePath', error);
+      log.error('compressImageFile() error', error);
+      throw new AppError('Error compressing file.', 400);
     }
   }
 
-  static computeFileSize(filePath: string) {
-    try {
-      const stats = fs.statSync(filePath);
-      return stats.size;
-    } catch (error) {
-      log.error('computeFileSize() error', error);
-      return -1; // Indicate an error
-    }
+  static async compressVideoBuffer(file: any) {
+    return new Promise((resolve, reject) => {
+      console.log('*** Hold on, we are compressing your file ***');
+
+      const buffer = file.buffer;
+      const ext = file.originalname.split('.')[1];
+
+      let outputBuffer: Buffer = Buffer.alloc(0);
+
+      const readableStream = Readable.from([buffer]);
+
+      ffmpeg()
+        .input(readableStream)
+        .inputFormat(ext)
+        .outputOptions(['-c:v libx264', '-crf 28'])
+        .toFormat('mp4')
+        .on('data', (chunk: any) => {
+          outputBuffer = Buffer.concat([outputBuffer, chunk]);
+        })
+        .on('end', () => {
+          console.log('*** Compression finished ***');
+          resolve(outputBuffer);
+        })
+        .on('error', (err: Error) => {
+          console.error('Error during compression:', err);
+          reject(err);
+        })
+        .run();
+    });
   }
 
   static readFileContent(filePath: string): Buffer {
@@ -60,13 +65,5 @@ export default class FileUtil {
       log.error('readFileContent() error', error);
       throw new AppError('Error reading file content', 400);
     }
-  }
-
-  private static isSupportedFileExtension(
-    value: string
-  ): value is SupportedExtension {
-    return Object.values(SupportedExtension).includes(
-      value as SupportedExtension
-    );
   }
 }

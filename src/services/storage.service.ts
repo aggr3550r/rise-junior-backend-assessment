@@ -3,6 +3,7 @@ import logger from '../utils/logger.util';
 import { AppError } from '../exceptions/AppError';
 import { UploadFileDTO } from '../modules/file/dtos/upload-file.dto';
 import FileUtil from '../utils/file.util';
+import { imageExtensions, videoExtensions } from '../types/constant.types';
 
 const log = logger.getLogger();
 
@@ -19,17 +20,23 @@ AWS.config.update({
 const s3 = new AWS.S3();
 
 export default class StorageService {
-  async uploadFileToS3(data: UploadFileDTO) {
+  async uploadFileToS3(data: UploadFileDTO, file: any) {
     try {
-      const fileKey = this.constructS3FileKey(data);
-      const filePath = data.file_path;
+      const fileKey = file.originalname;
+      const fileExt = fileKey.split('.')[1];
+      let compressedBuffer;
 
-      const fileContent = FileUtil.readFileContent(filePath);
+      if (imageExtensions.includes(fileExt)) {
+        compressedBuffer = await FileUtil.compressImageBuffer(file.buffer);
+      } else if (videoExtensions.includes(fileExt)) {
+        compressedBuffer = await FileUtil.compressVideoBuffer(file.buffer);
+      }
 
       const params = {
         Bucket: S3_BUCKET_NAME,
         Key: fileKey,
-        Body: fileContent,
+        Body: compressedBuffer,
+        ContentType: file.mimetype,
       };
 
       try {

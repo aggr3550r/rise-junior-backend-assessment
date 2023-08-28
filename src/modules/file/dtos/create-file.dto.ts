@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Max,
+} from 'class-validator';
 import { User } from '../../user/entities/user.entity';
 
 export class CreateFileDTO {
@@ -14,4 +21,10 @@ export class CreateFileDTO {
 
   @IsOptional()
   owner?: User;
+
+  @IsOptional()
+  @IsNumber()
+  @Max(200000000)
+  @IsPositive()
+  size?: number;
 }

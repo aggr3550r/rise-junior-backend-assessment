@@ -22,6 +22,7 @@ import StorageService from '../../services/storage.service';
 import { FileFlag } from '../../enums/file-flag.enum';
 import UserService from '../user/user.service';
 import { QueryType } from '../../enums/query-type.enum';
+import user from '../../routes/user';
 
 const log = logger.getLogger();
 
@@ -38,10 +39,18 @@ export default class FileService {
     try {
       const owner = await this.userService.findUserById(userId);
 
-      const { file_path, filename } = FileUtil.sanitizeFilePath(data.file_path);
+      const { filename, file_path, size } = data;
+      const createData: Partial<File> = {
+        file_path,
+        filename,
+        size,
+      };
 
       // Make sure no files with same filename already exist
-      const fileAlreadyExists = await this.findFileByFilename(userId, filename);
+      const fileAlreadyExists = await this.findFileByFilename(
+        userId,
+        data.filename
+      );
 
       if (fileAlreadyExists) {
         throw new ResourceAlreadyExistsException(
@@ -49,14 +58,11 @@ export default class FileService {
         );
       }
 
-      const fileSize = FileUtil.computeFileSize(file_path);
-
       data.owner = owner;
-      data.filename = filename;
-      data.file_path = file_path;
+
+      console.log('CREATING FILE', data);
 
       const newFile = this.fileRepository.create(data);
-      newFile.size = fileSize;
       return await this.fileRepository.save(newFile);
     } catch (error) {
       log.error('createFile() error', error);
@@ -72,6 +78,7 @@ export default class FileService {
   ): Promise<File> {
     try {
       const file = await this.findFileByEitherFilenameOrId(
+        userId,
         queryString,
         queryType
       );
@@ -85,9 +92,9 @@ export default class FileService {
     }
   }
 
-  async uploadFile(userId: string, data: UploadFileDTO) {
+  async uploadFile(userId: string, data: UploadFileDTO, file: any) {
     try {
-      const fileKey = await this.storageService.uploadFileToS3(data);
+      const fileKey = await this.storageService.uploadFileToS3(data, file);
 
       log.info(
         '** File uploaded to S3 bucket: collecting details...** \n ',
@@ -99,10 +106,8 @@ export default class FileService {
         fileKey
       );
 
-      const { filename } = FileUtil.sanitizeFilePath(fileKey);
-
       // Update file. It can now be downloaded publicly
-      await this.updateFile(userId, QueryType.NAME, filename, {
+      await this.updateFile(userId, QueryType.NAME, file.originalname, {
         file_download_link,
       });
     } catch (error) {
@@ -139,32 +144,35 @@ export default class FileService {
     }
   }
 
-  async reviewFile(fileId: string, data: ReviewFileDTO): Promise<File> {
+  async reviewFile(
+    fileId: string,
+    data: ReviewFileDTO
+  ): Promise<File | boolean> {
     try {
-      const file = await this.fileRepository.findOneBy({
-        id: fileId,
-        is_active: true,
+      const file = await this.fileRepository.findOne({
+        where: { id: fileId, is_active: true },
+        relations: ['owner'],
       });
       let fileUnsafeFlagCount = file.unsafe_count;
 
       const userId = file.owner.id;
 
-      if (data.fileFlag === FileFlag.UNSAFE) fileUnsafeFlagCount += 1;
+      if (data.file_flag === FileFlag.UNSAFE) fileUnsafeFlagCount += 1;
 
       const updates: Partial<UpdateFileDTO & ReviewFileDTO> = {
-        file_flag: data.fileFlag,
+        file_flag: data.file_flag,
         unsafe_count: fileUnsafeFlagCount,
         admin_review_comment: data.admin_review_comment,
       };
 
       if (fileUnsafeFlagCount >= 3) {
-        await this.deleteFile(userId, fileId);
+        return await this.deleteFile(userId, fileId);
       }
 
       return await this.updateFile(userId, QueryType.ID, fileId, updates);
     } catch (error) {
       log.error('reviewFile() error', error);
-      throw new AppError(error.message, error.status);
+      throw new AppError(RiseVestStatusMsg.FAILED, error?.statusCode || 400);
     }
   }
 
@@ -216,7 +224,7 @@ export default class FileService {
     try {
       let [items, count] = await this.fileRepository.findAndCount({
         where: {
-          owner: { id: userId },
+          owner: { id: userId, is_active: true },
           is_active: true,
         },
         skip: getFileOptionsPageDTO?.skip,
@@ -253,13 +261,13 @@ export default class FileService {
     }
   }
 
-  async findFileById(fileId: string, userId: string) {
+  async findFileById(userId: string, fileId: string) {
     try {
       const options: FindOneOptions<File> = {
         where: {
           id: fileId,
           is_active: true,
-          owner: { id: userId },
+          owner: { id: userId, is_active: true },
         },
       };
 
@@ -272,7 +280,7 @@ export default class FileService {
       }
       return fileExists;
     } catch (error) {
-      log.error('findUserById() error', error);
+      log.error('findFileById() error', error);
       throw new AppError('Unable to find file with that id', 400);
     }
   }
@@ -283,7 +291,7 @@ export default class FileService {
         where: {
           filename,
           is_active: true,
-          owner: { id: userId },
+          owner: { id: userId, is_active: true },
         },
       };
 
