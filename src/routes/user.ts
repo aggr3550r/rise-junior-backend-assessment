@@ -9,7 +9,7 @@ userRouter.addPattern(
   userController.registerUser.bind(userController)
 );
 
-userRouter.addIsAdminPattern(
+userRouter.addIsAuthenticatedPattern(
   HttpMethod.PATCH,
   '/:userId',
   userController.updateUser.bind(userController)

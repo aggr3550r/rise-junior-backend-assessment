@@ -4,10 +4,13 @@
   "description": "This repository houses code built in partial fulfilment of the interview process for a junior backend engineer role at RiseVest",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "cross-env NODE_ENV=development ts-node --files src",
     "build": "tsc",
-    "start:dev": "npm run build && cross-env NODE_ENV=development nodemon dist"
+    "start:dev": "npm run build && cross-env NODE_ENV=development nodemon dist",
+    "test": "cross-env NODE_ENV=test jest --testTimeout=10000 --setupFiles dotenv/config",
+    "test:coverage": "cross-env NODE_ENV=test jest --testTimeout=10000 --setupFiles dotenv/config --coverage",
+    "pretest": "",
+    "pretest:coverage": ""
   },
   "keywords": [],
   "author": "",
@@ -19,6 +22,7 @@
     "@types/morgan": "^1.9.5",
     "@types/multer": "^1.4.7",
     "@types/node": "^20.5.4",
+    "@types/supertest": "^2.0.12",
     "@types/winston": "^2.4.4",
     "aws-sdk": "^2.1444.0",
     "axios": "^1.4.0",

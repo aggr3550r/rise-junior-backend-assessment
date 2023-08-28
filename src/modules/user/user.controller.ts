@@ -15,11 +15,12 @@ export default class UserController {
 
   async registerUser(request: any): Promise<ResponseModel<User>> {
     try {
-      const { email, password, full_name } = request.body;
+      const { email, password, full_name, role = '' } = request.body;
       const data = await this.authService.signup({
         email,
         password,
         full_name,
+        role,
       });
       return new ResponseModel(
         HttpStatus.CREATED,

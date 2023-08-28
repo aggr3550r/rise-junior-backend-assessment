@@ -70,16 +70,11 @@ export default class AuthService {
 
   async signup(data: CreateUserDTO) {
     try {
-      let { email, password, full_name } = data;
-      password = await SecurityUtil.encryptPassword(password);
+      let { password } = data;
+      const encryptedPassword = await SecurityUtil.encryptPassword(password);
+      Object.assign(data, { password: encryptedPassword });
 
-      const userData: CreateUserDTO = {
-        email,
-        password,
-        full_name,
-      };
-
-      return await this.userService.createUser(userData);
+      return await this.userService.createUser(data);
     } catch (error) {
       log.error('signup() error', error);
       throw new AppError(
