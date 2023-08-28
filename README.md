@@ -13,14 +13,29 @@ The idea of the app is one that allows users to upload files to a remote storage
 
 In order to run the app, the first thing you need to do is create a .env file in the root of your project. The .env file should be like the one below
 ```bash
-DATABASE_URL="postgresql://victor:killshot@host.docker.internal:5432/earnipay_datastore?schema=public"
-JWT_SECRET=e3376540-31b5-11ed-a261-0242ac120002
-JWT_EXPIRES_IN=24h
-JWT_COOKIE_EXPIRES_IN=24
+# PG_HOST=XXXXXXXXXXXX
+# PG_PORT=5432
+# PG_USER=XXXXXXXXX
+# PG_PASSWORD=XXXXXXXXXXXX
+# PG_DATABASE=XXXXXXXXXXXX
+# DATABASE_URL=XXXXXXXXXXX
+# PORT=8000
+
+
+# # AWS
+# AWS_ACCESS_KEY_ID=XXXXXXXXXX
+# AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXX
+# AWS_REGION=us-east-1
+# S3_BUCKET_NAME=load-tester-store
+
+# # JWT
+# COOKIE_KEY=695ce164-3133-11ed-a261-0242ac120002
+# JWT_SECRET=e3376540-31b5-11ed-a261-0242ac120002
+# JWT_EXPIRES_IN=24h
+# JWT_COOKIE_EXPIRES_IN=24
 ```
 
 With that out of the way, there are two possible paths along which to proceed enumerated below:
-### * Docker Compose
 ### * Dockerfile
 
 #### Docker Compose 
