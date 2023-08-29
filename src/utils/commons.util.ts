@@ -24,14 +24,4 @@ export default class GlobalUtil {
     return version === 1 ? uuidv1() : uuidv4();
   }
 
-  /**
-   * Increases the numeric value of the given argument by raising it to the power of 7 to make the measure more eye-filling.
-   * @param arg
-   * @returns number
-   */
-  static exaggerate(arg: number): number {
-    let exaggeration = Math.floor(Math.random() * arg);
-    exaggeration = Math.pow(exaggeration, 2);
-    return exaggeration;
-  }
 }

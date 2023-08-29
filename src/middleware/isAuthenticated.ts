@@ -2,8 +2,6 @@ import { NextFunction } from 'express';
 import SecurityUtil from '../utils/security.util';
 import { getRepository } from 'typeorm';
 import { User } from '../modules/user/entities/user.entity';
-import { UnauthorizedException } from '../exceptions/UnauthorizedException';
-import { ResponseModel } from '../models/utility/ResponseModel';
 import { HttpStatus } from '../enums/http-status.enum';
 
 module.exports = async (req: any, res: any, next: NextFunction) => {

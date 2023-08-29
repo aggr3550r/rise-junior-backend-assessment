@@ -52,7 +52,7 @@ export default class FileService {
 
       if (fileAlreadyExists) {
         throw new ResourceAlreadyExistsException(
-          'File with that name already exists, choose another.'
+          "File with that name already exists, choose another name, file or rename the one you're currently trying to upload."
         );
       }
 

@@ -45,7 +45,7 @@ module.exports =
 
         sanitizedUser = sanitizedUser.map((obj) => ({
           ...obj,
-          password: undefined,
+          password: '***redacted***',
         }));
 
         response.status(data.statusCode).json({
