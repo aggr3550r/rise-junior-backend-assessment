@@ -6,7 +6,6 @@
 import UserService from '../modules/user/user.service';
 import FileService from '../modules/file/file.service';
 import StorageService from '../services/storage.service';
-import { File } from '../modules/file/entities/file.entity';
 import FolderService from '../modules/folder/folder.service';
 import AuthService from '../modules/user/auth/auth.service';
 import UserController from '../modules/user/user.controller';
