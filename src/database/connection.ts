@@ -1,8 +1,18 @@
 import { createConnection, getConnection } from 'typeorm';
+import { configService } from '../config/config.service';
 
-const connection = {
+let connection = {
   async create() {
-    await createConnection();
+    const dbConnect = await createConnection(configService.getTypeOrmConfig())
+      .then(() => {
+        getConnection('default');
+        console.log('*** -----  Database connected ----- ***');
+      })
+      .catch((error) => {
+        console.error('!!! Unable to connect to the database !!! \n %o', error);
+      });
+
+    return dbConnect;
   },
 
   async close() {
@@ -10,7 +20,7 @@ const connection = {
   },
 
   async clear() {
-    const connection = getConnection();
+    const connection = getConnection('default');
     const entities = connection.entityMetadatas;
 
     entities.forEach(async (entity) => {

@@ -11,16 +11,15 @@ import { GetFolderOptionsDTO } from './dtos/get-folder-options.dto';
 import { PageMetaDTO } from '../../paging/page-meta.dto';
 import { UnauthorizedException } from '../../exceptions/UnauthorizedException';
 import { ResourceAlreadyExistsException } from '../../exceptions/ResourceAlreadyExistsException';
+import { FolderRepository } from './repositories/folder.repository';
 
 const log = logger.getLogger();
 export default class FolderService {
   constructor(
-    private folderRepository: Repository<Folder>,
+    private folderRepository: FolderRepository,
     private readonly userService: UserService,
     private readonly fileService: FileService
-  ) {
-    this.folderRepository = getRepository(Folder);
-  }
+  ) {}
 
   async createFolder(name: string, ownerId: string) {
     try {

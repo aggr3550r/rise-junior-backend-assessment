@@ -3,20 +3,12 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import { DataSource, createConnection, getConnection } from 'typeorm';
 import logger from './utils/logger.util';
-import { configService } from './config/config.service';
 import 'reflect-metadata';
 
-let connection: DataSource;
-createConnection(configService.getTypeOrmConfig())
-  .then(() => {
-    connection = getConnection('default');
-    console.log('*** -----  Database connected ----- ***');
-  })
-  .catch((error) => {
-    console.error('!!! Unable to connect to the database !!! \n %o', error);
-  });
+import connection from './database/connection';
+
+const dbConnect = connection.create();
 
 import routes from './routes';
 import AllExceptionsFilter from './filters/app-exception.filter';
@@ -44,4 +36,4 @@ app.use('/api/v1', routes);
 
 app.use(AllExceptionsFilter);
 
-export { app, connection };
+export { app, dbConnect };

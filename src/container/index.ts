@@ -3,9 +3,6 @@
  *  NestJS creates something like this for us on its own when our application bootstraps so we don't have to but we have to do it manually in Express.
  */
 
-import { Repository, getRepository } from 'typeorm';
-import { User } from '../modules/user/entities/user.entity';
-import { Folder } from '../modules/folder/entities/folder.entity';
 import UserService from '../modules/user/user.service';
 import FileService from '../modules/file/file.service';
 import StorageService from '../services/storage.service';
@@ -16,15 +13,18 @@ import UserController from '../modules/user/user.controller';
 import AuthController from '../modules/user/auth/auth.controller';
 import FileController from '../modules/file/file.controller';
 import FolderController from '../modules/folder/folder.controller';
+import { UserRepository } from '../modules/user/repositories/user.repository';
+import { FileRepository } from '../modules/file/repositories/file.repository';
+import { FolderRepository } from '../modules/folder/repositories/folder.repository';
 
 /**
  * @author aggr3550r
  */
 
 /* REPOSITORIES */
-const userRepository: Repository<User> = getRepository(User);
-const fileRepository: Repository<File> = getRepository(File);
-const folderRepository: Repository<Folder> = getRepository(Folder);
+const userRepository = new UserRepository();
+const fileRepository = new FileRepository();
+const folderRepository = new FolderRepository();
 
 /* SERVICES */
 

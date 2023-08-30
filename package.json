@@ -7,14 +7,19 @@
     "start": "cross-env NODE_ENV=development ts-node --files src",
     "build": "tsc",
     "start:dev": "npm run build && cross-env NODE_ENV=development nodemon dist",
-    "test": "jest --transformIgnorePatterns \"/node_modules/(?!rise-junior-backend-assessment/)\" --env=jsdom"
+    "test": "jest --detectOpenHandles",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "pretest": "",
   "pretest:coverage": "",
   "keywords": [],
-  "author": "",
+  "author": "Victor Uche",
   "license": "ISC",
   "dependencies": {
+    "@jest/types": "^29.6.3",
     "@sentry/tracing": "^7.64.0",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
@@ -47,7 +52,7 @@
     "supertest": "^6.3.3",
     "ts-node": "^10.9.1",
     "tslint": "^6.1.3",
-    "typeorm": "^0.3.17",
+    "typeorm": "^0.2.41",
     "typescript": "^5.1.6",
     "uuid": "^9.0.0",
     "winston": "^3.10.0"
@@ -65,5 +70,25 @@
     "jest-environment-jsdom": "^29.6.4",
     "nodemon": "^3.0.1",
     "ts-jest": "^29.1.1"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/?(*.)+(spec|test).(t|j)s"
+    ],
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "jest-environment-jsdom"
   }
 }

@@ -30,7 +30,11 @@ module.exports = async (req: any, res: any, next: NextFunction) => {
     process.env.JWT_SECRET
   );
 
-  const user = await userRepo.findOneBy({ id: payload['id'] });
+  const user = await userRepo.findOne({
+    where: {
+      id: payload['id'],
+    },
+  });
 
   if (!payload)
     return res.status(401).send({

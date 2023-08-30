@@ -1,4 +1,4 @@
-import { DataSourceOptions } from 'typeorm';
+import { ConnectionOptions } from 'typeorm';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
@@ -34,56 +34,32 @@ class ConfigService {
     return mode == 'development' || mode == 'dev' || mode == 'develop';
   }
 
-  public getTypeOrmConfig(): DataSourceOptions {
-    const databaseUrl = this.getValue('DATABASE_URL');
-    if (databaseUrl) {
-      return {
-        name: 'default',
-        type: 'postgres',
-        url: this.getValue('DATABASE_URL'),
-        entities: [
-          __dirname + '/../**/*.entity{.ts,.js}',
-          __dirname + '/../**/*.repository{.ts,.js}',
-        ],
-        migrationsTableName: 'migration',
-        migrations: [__dirname + 'src/migration/*.ts'],
-        // autoLoadEntities: true,
-        synchronize: true,
-        migrationsRun: true,
-        ssl: this.isDevelopment()
-          ? false
-          : {
-              rejectUnauthorized: true,
-            },
-      };
-    } else
-      return {
-        name: 'default',
-        type: 'postgres',
-        host: this.getValue('PG_HOST'),
-        port: parseInt(this.getValue('PG_PORT')),
-        username: this.getValue('PG_USER'),
-        password: this.getValue('PG_PASSWORD'),
-        database: this.getValue('PG_DATABASE'),
-        entities: [
-          __dirname + '/../**/*.entity{.ts,.js}',
-          __dirname + '/../**/*.repository{.ts,.js}',
-        ],
-        migrationsTableName: 'migration',
-        migrations: [__dirname + 'src/migration/*.ts'],
-        // autoLoadEntities: true,
-        synchronize: true,
-        migrationsRun: true,
-        ssl: this.isDevelopment()
-          ? false
-          : {
-              rejectUnauthorized: true,
-            },
-      };
+  public getTypeOrmConfig(): ConnectionOptions {
+    return {
+      name: 'default',
+      type: 'postgres',
+      host: this.getValue('PG_HOST'),
+      port: parseInt(this.getValue('PG_PORT')),
+      username: this.getValue('PG_USER'),
+      password: this.getValue('PG_PASSWORD'),
+      database: this.getValue('PG_DATABASE'),
+      entities: [
+        __dirname + '/../**/*.entity{.ts,.js}',
+        __dirname + '/../**/*.repository{.ts,.js}',
+      ],
+      migrationsTableName: 'migration',
+      migrations: [__dirname + 'src/migration/*.ts'],
+      // autoLoadEntities: true,
+      synchronize: true,
+      migrationsRun: true,
+      ssl: this.isDevelopment()
+        ? false
+        : {
+            rejectUnauthorized: true,
+          },
+    };
   }
 }
-
-
 
 const configService = new ConfigService(process.env).ensureValues([
   'PG_HOST',

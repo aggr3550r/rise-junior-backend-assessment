@@ -10,13 +10,12 @@ import { PageMetaDTO } from '../../paging/page-meta.dto';
 import { PageDTO } from '../../paging/page.dto';
 import { UserAlreadyExistsException } from '../../exceptions/UserAlreadyExistsException';
 import { ResourceNotFoundException } from '../../exceptions/ResourceNotFound';
+import { UserRepository } from './repositories/user.repository';
 
 const log = logger.getLogger();
 
 export default class UserService {
-  constructor(private userRepository: Repository<User>) {
-    this.userRepository = getRepository(User);
-  }
+  constructor(private userRepository: UserRepository) {}
 
   async createUser(data: CreateUserDTO): Promise<User> {
     try {
