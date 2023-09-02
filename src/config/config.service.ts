@@ -1,4 +1,4 @@
-import { DataSourceOptions } from 'typeorm';
+import { ConnectionOptions } from 'typeorm';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
@@ -34,7 +34,7 @@ class ConfigService {
     return mode == 'development' || mode == 'dev' || mode == 'develop';
   }
 
-  public getTypeOrmConfig(): DataSourceOptions {
+  public getTypeOrmConfig(): ConnectionOptions {
     return {
       type: 'postgres',
       host: this.getValue('PG_HOST'),
