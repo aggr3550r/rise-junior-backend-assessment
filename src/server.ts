@@ -6,9 +6,19 @@ import helmet from 'helmet';
 import logger from './utils/logger.util';
 import 'reflect-metadata';
 
-import connection from './database/connection';
 
-const dbConnect = connection.create();
+
+import { createConnection, getConnection } from 'typeorm';
+import { configService } from './config/config.service';
+
+createConnection(configService.getTypeOrmConfig())
+  .then(async () => {
+    getConnection();
+    console.log('*** ----- Database connected ----- ***');
+  })
+  .catch((error) => {
+    console.error('!!! Unable to connect to the database !!! \n %o', error);
+  });
 
 import routes from './routes';
 import AllExceptionsFilter from './filters/app-exception.filter';
@@ -36,4 +46,4 @@ app.use('/api/v1', routes);
 
 app.use(AllExceptionsFilter);
 
-export { app, dbConnect };
+export { app };

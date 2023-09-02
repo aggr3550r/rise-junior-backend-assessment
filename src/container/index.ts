@@ -12,18 +12,19 @@ import UserController from '../modules/user/user.controller';
 import AuthController from '../modules/user/auth/auth.controller';
 import FileController from '../modules/file/file.controller';
 import FolderController from '../modules/folder/folder.controller';
-import { UserRepository } from '../modules/user/repositories/user.repository';
-import { FileRepository } from '../modules/file/repositories/file.repository';
-import { FolderRepository } from '../modules/folder/repositories/folder.repository';
+import { Repository, getRepository } from 'typeorm';
+import { User } from '../modules/user/entities/user.entity';
+import { File } from '../modules/file/entities/file.entity';
+import { Folder } from '../modules/folder/entities/folder.entity';
 
 /**
  * @author aggr3550r
  */
 
 /* REPOSITORIES */
-const userRepository = new UserRepository();
-const fileRepository = new FileRepository();
-const folderRepository = new FolderRepository();
+const userRepository: Repository<User> = getRepository<User>(User);
+const fileRepository: Repository<File> = getRepository<File>(File);
+const folderRepository: Repository<Folder> = getRepository<Folder>(Folder);
 
 /* SERVICES */
 

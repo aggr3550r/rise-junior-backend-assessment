@@ -15,7 +15,9 @@ import { UserRepository } from './repositories/user.repository';
 const log = logger.getLogger();
 
 export default class UserService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(private userRepository: Repository<User>) {
+    this.userRepository = getRepository<User>(User);
+  }
 
   async createUser(data: CreateUserDTO): Promise<User> {
     try {
