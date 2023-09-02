@@ -21,16 +21,17 @@ import StorageService from '../../services/storage.service';
 import { FileFlag } from '../../enums/file-flag.enum';
 import UserService from '../user/user.service';
 import { QueryType } from '../../enums/query-type.enum';
-import { FileRepository } from './repositories/file.repository';
 
 const log = logger.getLogger();
 
 export default class FileService {
   constructor(
-    private fileRepository: FileRepository,
+    private fileRepository: Repository<File>,
     private storageService: StorageService,
     private userService: UserService
-  ) {}
+  ) {
+    this.fileRepository = getRepository<File>(File);
+  }
 
   async createFile(userId: string, data: CreateFileDTO): Promise<File> {
     try {

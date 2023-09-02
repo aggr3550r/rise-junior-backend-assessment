@@ -10,7 +10,7 @@ import { PageMetaDTO } from '../../paging/page-meta.dto';
 import { PageDTO } from '../../paging/page.dto';
 import { UserAlreadyExistsException } from '../../exceptions/UserAlreadyExistsException';
 import { ResourceNotFoundException } from '../../exceptions/ResourceNotFound';
-import { UserRepository } from './repositories/user.repository';
+
 
 const log = logger.getLogger();
 
