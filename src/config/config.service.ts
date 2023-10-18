@@ -35,6 +35,23 @@ class ConfigService {
   }
 
   public getTypeOrmConfig(): ConnectionOptions {
+    const dbUrl = this.getValue('DATABASE_URL');
+
+    if (dbUrl) {
+      return {
+        type: 'postgres',
+        url: dbUrl,
+        entities: [
+          __dirname + '/../**/*.entity{.ts,.js}',
+          __dirname + '/../**/*.repository{.ts,.js}',
+        ],
+        migrationsTableName: 'migration',
+        migrations: [__dirname + 'src/migration/*.ts'],
+        // autoLoadEntities: true,
+        synchronize: true,
+        migrationsRun: true,
+      };
+    }
     return {
       type: 'postgres',
       host: this.getValue('PG_HOST'),
@@ -52,9 +69,13 @@ class ConfigService {
       synchronize: true,
       migrationsRun: true,
       ssl: this.isDevelopment()
-        ? false
+        ? {
+            requestCert: false,
+            rejectUnauthorized: false,
+          }
         : {
-            rejectUnauthorized: true,
+            requestCert: false,
+            rejectUnauthorized: false,
           },
     };
   }
