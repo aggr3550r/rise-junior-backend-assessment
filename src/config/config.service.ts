@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { ConnectionOptions } from 'typeorm';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -38,6 +39,7 @@ class ConfigService {
     const dbUrl = this.getValue('DATABASE_URL');
 
     if (dbUrl) {
+      console.info('USING DB URL \n %o', dbUrl);
       return {
         type: 'postgres',
         url: dbUrl,
@@ -50,6 +52,7 @@ class ConfigService {
         // autoLoadEntities: true,
         synchronize: true,
         migrationsRun: true,
+        ssl: true,
       };
     }
     return {
@@ -68,14 +71,7 @@ class ConfigService {
       // autoLoadEntities: true,
       synchronize: true,
       migrationsRun: true,
-      ssl: this.isDevelopment()
-        ? {
-            requestCert: false,
-            rejectUnauthorized: false,
-          }
-        : {
-            rejectUnauthorized: true,
-          },
+      ssl: false,
     };
   }
 }
