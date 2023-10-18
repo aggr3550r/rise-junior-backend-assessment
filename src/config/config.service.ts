@@ -74,8 +74,7 @@ class ConfigService {
             rejectUnauthorized: false,
           }
         : {
-            requestCert: false,
-            rejectUnauthorized: false,
+            rejectUnauthorized: true,
           },
     };
   }
