@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import { ConnectionOptions } from 'typeorm';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
