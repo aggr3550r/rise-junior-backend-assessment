@@ -15,7 +15,7 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "outDir": "dist",
-    "typeRoots": ["src/typings"],
+    "typeRoots": ["node_modules/@types", "src/types"],
     "baseUrl": ".",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

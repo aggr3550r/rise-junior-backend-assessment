@@ -25,29 +25,38 @@ module.exports = async (req: any, res: any, next: NextFunction) => {
     });
   }
 
+  console.info('MIDDLEWARE LOG', token);
+
   const payload: any = await SecurityUtil.verifyTokenWithSecret(
     token,
     process.env.JWT_SECRET
   );
 
+  console.info('MIDDLEWARE LOG', payload);
+
+  if (!payload.data)
+    return res.status(401).json({
+      statusCode: 401,
+      message:
+        payload.message ||
+        '[is-authenticated] 1 You are not authorized to access this resource',
+      data: null,
+    });
+
   const user = await userRepo.findOne({
     where: {
-      id: payload['id'],
+      id: payload.data['id'],
     },
   });
 
-  if (!payload)
-    return res.status(401).send({
-      message:
-        '[is-authenticated] 1 You are not authorized to access this resource',
-    });
+  console.info('NA ME BE USER \n %o', user);
 
   if (!user)
     return res.status(401).send({
       message:
         '[is-authenticated] 2 You are not authorized to access this resource',
     });
-  req.auth = payload;
-  req.user = payload;
+  req.auth = payload.data;
+  req.user = payload.data;
   return next();
 };

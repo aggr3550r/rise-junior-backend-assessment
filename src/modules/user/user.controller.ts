@@ -1,7 +1,6 @@
 import { HttpStatus } from '../../enums/http-status.enum';
 import { RiseVestStatusMsg } from '../../enums/rise-response.enum';
 import { ResponseModel } from '../../models/utility/ResponseModel';
-import { PageDTO } from '../../paging/page.dto';
 
 import AuthService from './auth/auth.service';
 import { User } from './entities/user.entity';

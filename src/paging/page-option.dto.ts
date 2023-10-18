@@ -6,14 +6,14 @@ export class PageOptionsDTO {
   @IsInt()
   @Min(1)
   @IsOptional()
-  page?: number = 1;
+  page: number = 1;
 
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(50)
   @IsOptional()
-  take?: number = 20;
+  take: number = 20;
 
   @IsOptional()
   sort_by?: string;

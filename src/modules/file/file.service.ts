@@ -52,7 +52,7 @@ export default class FileService {
 
       if (fileAlreadyExists) {
         throw new ResourceAlreadyExistsException(
-          "File with that name already exists, choose another name, file or rename the one you're currently trying to upload."
+          "File with that name already exists, choose another file or rename the one you're currently trying to upload."
         );
       }
 
@@ -106,6 +106,8 @@ export default class FileService {
       await this.updateFile(userId, QueryType.NAME, file.originalname, {
         file_download_link,
       });
+
+      return file_download_link;
     } catch (error) {
       log.error('uploadFile() error', error);
       throw new AppError(RiseVestStatusMsg.FAILED, 400);
@@ -218,6 +220,7 @@ export default class FileService {
     getFileOptionsPageDTO: GetFileOptionsPageDTO
   ): Promise<PageDTO<File>> {
     try {
+      const queryPage = new GetFileOptionsPageDTO();
       let [items, count] = await this.fileRepository.findAndCount({
         where: {
           owner: { id: userId, is_active: true },
@@ -226,6 +229,8 @@ export default class FileService {
         skip: getFileOptionsPageDTO?.skip,
         take: getFileOptionsPageDTO?.take,
       });
+
+      console.info('QUERY QUERY \n %o', queryPage);
 
       const pageMetaDTO = new PageMetaDTO({
         page_options_dto: getFileOptionsPageDTO,

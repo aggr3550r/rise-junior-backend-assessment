@@ -5,7 +5,7 @@ import { AppError } from '../exceptions/AppError';
 import { ResourceNotFoundException } from '../exceptions/ResourceNotFound';
 import { User } from '../modules/user/entities/user.entity';
 import logger from './logger.util';
-import { JWTException } from '../exceptions/JWTException';
+import { ResponseModel } from '../models/utility/ResponseModel';
 
 const scrypt = promisify(_scrypt);
 const log = logger.getLogger();
@@ -21,10 +21,15 @@ export default class SecurityUtil {
   static async verifyTokenWithSecret(token: any, secretKey: string) {
     try {
       const decoded = JWT.verify(token, secretKey);
-      return decoded;
+      return new ResponseModel(200, 'Success', decoded);
     } catch (error) {
-      console.error('verifyTokenWithSecret error()');
-      throw new JWTException(error.message.toString().toLocaleUpperCase());
+      console.error('verifyTokenWithSecret error() \n %o', error);
+      return new ResponseModel(
+        error?.status || 400,
+        error.message.toString().toLocaleUpperCase() ||
+          'Error occurred while verifying JWT token.',
+        null
+      );
     }
   }
 

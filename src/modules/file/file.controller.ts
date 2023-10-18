@@ -23,22 +23,36 @@ export default class FileController {
         size: file.size,
       };
 
-      await this.fileService.createFile(userId, data);
+      const { id } = await this.fileService.createFile(userId, data);
 
       const uploadData: UploadFileDTO = {
         file_path: file.file_path,
         filename: file.filename,
       };
 
-      await this.fileService.uploadFile(userId, uploadData, file);
+      const file_download_link = await this.fileService.uploadFile(
+        userId,
+        uploadData,
+        file
+      );
 
       log.info('** uploaded file to s3 bucket... **', uploadData);
 
-      return new ResponseModel(
-        HttpStatus.OK,
-        'Successfully uploaded file.',
-        file
-      );
+      const {
+        fieldname,
+        originalname: filenameInBucket,
+        encoding: fileEncoding,
+        mimetype,
+      } = file;
+
+      return new ResponseModel(HttpStatus.OK, 'Successfully uploaded file.', {
+        id,
+        downloadLink: file_download_link.toString(),
+        originalname: filenameInBucket,
+        fieldname,
+        encoding: fileEncoding,
+        mimetype,
+      });
     } catch (error) {
       return new ResponseModel(
         error?.statusCode || HttpStatus.BAD_REQUEST,
