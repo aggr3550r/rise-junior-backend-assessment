@@ -13,6 +13,20 @@ export default class FileUtil {
       const buffer: Buffer = file.buffer;
       console.log('*** Hold on, we are compressing your file ***');
 
+      const {
+        fieldname,
+        originalname: filenameInBucket,
+        encoding: fileEncoding,
+        mimetype,
+      } = file;
+
+      console.info('Input Buffer size \n %o', {
+        fieldname,
+        originalname: filenameInBucket,
+        encoding: fileEncoding,
+        mimetype,
+      });
+
       const compressedImageBuffer = await sharp(buffer)
         .resize({ width: 800 }) // Adjust the width as needed
         .toBuffer();
@@ -22,7 +36,7 @@ export default class FileUtil {
       return compressedImageBuffer;
     } catch (error) {
       log.error('compressImageFile() error', error);
-      throw new AppError('Error compressing file.', 400);
+      throw new AppError(error?.message || 'Error compressing file.', 400);
     }
   }
 
@@ -63,7 +77,7 @@ export default class FileUtil {
       return fileContent;
     } catch (error) {
       log.error('readFileContent() error', error);
-      throw new AppError('Error reading file content', 400);
+      throw new AppError(error?.message || 'Error reading file content', 400);
     }
   }
 }

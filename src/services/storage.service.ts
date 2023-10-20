@@ -26,10 +26,16 @@ export default class StorageService {
       const fileExt = fileKey.split('.')[1];
       let compressedBuffer;
 
-      if (imageExtensions.includes(fileExt)) {
-        compressedBuffer = await FileUtil.compressImageBuffer(file.buffer);
-      } else if (videoExtensions.includes(fileExt)) {
-        compressedBuffer = await FileUtil.compressVideoBuffer(file.buffer);
+      console.info('File in storage service \n %o', file);
+
+      if (file.size > 10000) {
+        if (imageExtensions.includes(fileExt)) {
+          compressedBuffer = await FileUtil.compressImageBuffer(file.buffer);
+        } else if (videoExtensions.includes(fileExt)) {
+          compressedBuffer = await FileUtil.compressVideoBuffer(file.buffer);
+        }
+      } else {
+        compressedBuffer = file?.buffer;
       }
 
       const params = {
@@ -49,7 +55,10 @@ export default class StorageService {
       }
     } catch (error) {
       log.error('uploadFileToS3() error', error);
-      throw new AppError('Error uploading file to S3 Bucket...', 400);
+      throw new AppError(
+        error?.message || 'Error uploading file to S3 Bucket...',
+        error?.statusCode || 400
+      );
     }
   }
 
@@ -74,7 +83,10 @@ export default class StorageService {
       }
     } catch (error) {
       log.error('removeFileFromS3() error', error);
-      throw new AppError('Error removing file from S3 Bucket...', 400);
+      throw new AppError(
+        error?.message || 'Error removing file from S3 Bucket...',
+        error?.statusCode || 400
+      );
     }
   }
 
@@ -89,7 +101,10 @@ export default class StorageService {
       return url;
     } catch (error) {
       log.error('getDownloadUrl() error', error);
-      throw new AppError('Error generating dowload URL', 400);
+      throw new AppError(
+        error?.message || 'Error generating dowload URL',
+        error?.statusCode || 400
+      );
     }
   }
 

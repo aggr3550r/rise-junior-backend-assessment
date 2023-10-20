@@ -43,4 +43,10 @@ fileRouter.addIsAuthenticatedPattern(
   fileController.getFilesForUser.bind(fileController)
 );
 
+fileRouter.addIsAuthenticatedPattern(
+  HttpMethod.DELETE,
+  '/:fileId',
+  fileController.deleteFile.bind(fileController)
+);
+
 export default fileRouter.getExpressRouter();

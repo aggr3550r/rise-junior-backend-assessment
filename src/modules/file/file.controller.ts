@@ -1,5 +1,6 @@
 import { HttpStatus } from '../../enums/http-status.enum';
 import { RiseVestStatusMsg } from '../../enums/rise-response.enum';
+import UnsupportedFileFormatException from '../../exceptions/UnsupportedFileFormatException';
 import { ResponseModel } from '../../models/utility/ResponseModel';
 import logger from '../../utils/logger.util';
 import { CreateFileDTO } from './dtos/create-file.dto';
@@ -16,21 +17,21 @@ export default class FileController {
   async uploadFile(request: any) {
     try {
       const file = request.file;
-      const { id: userId } = request.auth;
-      const data: CreateFileDTO = {
-        file_path: file.originalname,
-        filename: file.originalname,
-        size: file.size,
-      };
+      console.info('FILE \n %o', file);
+      if (!file) {
+        throw new UnsupportedFileFormatException(
+          'You must select a valid file to upload.'
+        );
+      }
 
-      const { id } = await this.fileService.createFile(userId, data);
+      const { id: userId } = request.auth;
 
       const uploadData: UploadFileDTO = {
         file_path: file.file_path,
         filename: file.filename,
       };
 
-      const file_download_link = await this.fileService.uploadFile(
+      const { file_download_link, fileId } = await this.fileService.uploadFile(
         userId,
         uploadData,
         file
@@ -46,7 +47,7 @@ export default class FileController {
       } = file;
 
       return new ResponseModel(HttpStatus.OK, 'Successfully uploaded file.', {
-        id,
+        fileId,
         downloadLink: file_download_link.toString(),
         originalname: filenameInBucket,
         fieldname,
@@ -121,6 +122,27 @@ export default class FileController {
       const files = await this.fileService.getFilesForUser(userId, queryObject);
 
       return new ResponseModel(HttpStatus.OK, RiseVestStatusMsg.SUCCESS, files);
+    } catch (error) {
+      return new ResponseModel(
+        error?.statusCode || HttpStatus.BAD_REQUEST,
+        error?.message || RiseVestStatusMsg.FAILED,
+        null
+      );
+    }
+  }
+
+  async deleteFile(request: any) {
+    try {
+      const { fileId } = request.params;
+      const { id: userId } = request.auth;
+
+      const serviceResponse = await this.fileService.deleteFile(userId, fileId);
+
+      return new ResponseModel(
+        HttpStatus.OK,
+        'Successfully Deleted File',
+        serviceResponse
+      );
     } catch (error) {
       return new ResponseModel(
         error?.statusCode || HttpStatus.BAD_REQUEST,

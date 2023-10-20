@@ -22,6 +22,7 @@ import { FileFlag } from '../../enums/file-flag.enum';
 import UserService from '../user/user.service';
 import { QueryType } from '../../enums/query-type.enum';
 
+
 const log = logger.getLogger();
 
 export default class FileService {
@@ -102,15 +103,32 @@ export default class FileService {
         fileKey
       );
 
+      let fileId: string;
+
+      if (file_download_link) {
+        const data: CreateFileDTO = {
+          file_path: file.originalname,
+          filename: file.originalname,
+          size: file.size,
+        };
+
+        const { id } = await this.createFile(userId, data);
+
+        fileId = id;
+      }
+
       // Update file. It can now be downloaded publicly
       await this.updateFile(userId, QueryType.NAME, file.originalname, {
         file_download_link,
       });
 
-      return file_download_link;
+      return { file_download_link, fileId };
     } catch (error) {
       log.error('uploadFile() error', error);
-      throw new AppError(RiseVestStatusMsg.FAILED, 400);
+      throw new AppError(
+        error?.message || RiseVestStatusMsg.FAILED,
+        error?.statusCode || 400
+      );
     }
   }
 
@@ -120,7 +138,6 @@ export default class FileService {
     filename?: string
   ): Promise<string> {
     try {
-      let queryType: QueryType = QueryType.ID;
       let file: File;
       if (filename) {
         file = await this.findFileByEitherFilenameOrId(
