@@ -24,19 +24,19 @@ export default class StorageService {
     try {
       const fileKey = file.originalname;
       const fileExt = fileKey.split('.')[1];
-      let compressedBuffer;
+      let compressedBuffer = file?.buffer;
 
       console.info('File in storage service \n %o', file);
 
-      if (file.size > 10000) {
-        if (imageExtensions.includes(fileExt)) {
-          compressedBuffer = await FileUtil.compressImageBuffer(file.buffer);
-        } else if (videoExtensions.includes(fileExt)) {
-          compressedBuffer = await FileUtil.compressVideoBuffer(file.buffer);
-        }
-      } else {
-        compressedBuffer = file?.buffer;
-      }
+      // if (file.size > 10000) {
+      //   if (imageExtensions.includes(fileExt)) {
+      //     compressedBuffer = await FileUtil.compressImageBuffer(file.buffer);
+      //   } else if (videoExtensions.includes(fileExt)) {
+      //     compressedBuffer = await FileUtil.compressVideoBuffer(file.buffer);
+      //   }
+      // } else {
+      //   compressedBuffer = file?.buffer;
+      // }
 
       const params = {
         Bucket: S3_BUCKET_NAME,
